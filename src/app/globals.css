@@ -1,26 +1,428 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ==========================================================================
+   Tulsi Jewellers design tokens
+   Premium Indian showroom: ivory paper, deep maroon brand, muted gold accents.
+   ========================================================================== */
+
+@theme {
+  /* Brand palette */
+  --color-ivory: #faf6ee;
+  --color-champagne: #efe3c8;
+  --color-offwhite: #fffdf8;
+  --color-maroon: #5a0f1b;
+  --color-maroon-700: #470c16;
+  --color-maroon-300: #8a3541;
+  --color-charcoal: #1f1b16;
+  --color-gold: #b8923a;
+  --color-gold-600: #9a7a2e;
+  /* Small label/kicker text on ivory: gold-600 only reaches 3.7:1, so text uses
+     this darker bronze (>=4.5:1 on ivory, offwhite and champagne) while icons
+     and hairline accents keep the brighter gold-600. */
+  --color-gold-700: #7a5c1c;
+  --color-gold-100: #e8d9ae;
+  --color-emerald: #0f3d2e;
+  --color-emerald-600: #165a44;
+  /* Fixed dark surfaces (footer, intro) that stay deep in both themes. */
+  --color-ink: #1f1b16;
+  --color-cream: #faf6ee;
+
+  /* Semantic surfaces */
+  --color-surface: var(--color-offwhite);
+  --color-surface-alt: var(--color-ivory);
+
+  /* Typography (font variables injected by next/font in layout.tsx) */
+  --font-display: var(--font-playfair), "Tiro Devanagari Hindi", Georgia, serif;
+  --font-body: var(--font-inter), "Noto Sans Devanagari", system-ui, sans-serif;
+  --font-hindi-display: var(--font-tiro), "Tiro Devanagari Hindi", Georgia, serif;
+  --font-hindi-body: var(--font-noto-dev), "Noto Sans Devanagari", system-ui, sans-serif;
+
+  /* Hairlines & shadows */
+  --border-hairline: 1px solid color-mix(in srgb, var(--color-gold) 45%, transparent);
+  --shadow-soft: 0 10px 40px -18px rgb(31 27 22 / 0.35);
+  --shadow-lift: 0 18px 50px -20px rgb(90 15 27 / 0.35);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/*
+ * Night theme — candle-lit showroom.
+ *
+ * Every colour utility on the site reads these tokens, so one attribute swaps
+ * the whole palette. Warm off-black paper keeps photographs looking gold rather
+ * than clinical, and the "maroon" token becomes the lit gold used for headings
+ * and solid buttons (dark text on gold keeps its contrast in both directions).
+ */
+:root[data-theme="night"] {
+  --color-ivory: #12100c;
+  --color-champagne: #2b2317;
+  --color-offwhite: #1a1611;
+  --color-maroon: #e3bd77;
+  --color-maroon-700: #f0d29a;
+  --color-maroon-300: #b8904e;
+  --color-charcoal: #f2e9d8;
+  --color-gold: #c9a45c;
+  --color-gold-600: #d9ba7c;
+  --color-gold-700: #e7cd9a;
+  --color-gold-100: #3b2f1b;
+  --color-emerald: #8fd6b6;
+  --color-emerald-600: #a7e4c9;
+  --shadow-soft: 0 10px 40px -18px rgb(0 0 0 / 0.75);
+  --shadow-lift: 0 18px 50px -20px rgb(0 0 0 / 0.85);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Photographs should not glow on dark paper. */
+:root[data-theme="night"] .photo-warm {
+  filter: saturate(1.02) contrast(1.02) brightness(0.92) sepia(0.06);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-ivory);
+    color: var(--color-charcoal);
+    font-family: var(--font-body);
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    color: var(--color-charcoal);
+    letter-spacing: -0.01em;
+  }
+
+  /* Devanagari copy keeps its own typeface automatically */
+  :lang(hi) {
+    font-family: var(--font-hindi-body);
+  }
+
+  /* Wide tracking suits Latin caps but breaks Devanagari clusters */
+  html[lang="hi"] [class*="tracking-"] {
+    letter-spacing: 0.04em;
+  }
+
+  :lang(hi) h1,
+  :lang(hi) h2,
+  :lang(hi) h3,
+  :lang(hi) h4 {
+    font-family: var(--font-hindi-display);
+  }
+
+  /*
+   * Devanagari sits taller than Latin: the matras above and the descenders below
+   * need headroom, and a line-height tuned for English crowds them. Hindi body
+   * copy therefore gets a looser default — an explicit Tailwind `leading-*` on
+   * an element still wins, because utilities are applied after this layer.
+   */
+  :lang(hi) {
+    line-height: 1.75;
+  }
+
+  :lang(hi) h1,
+  :lang(hi) h2,
+  :lang(hi) h3,
+  :lang(hi) h4 {
+    line-height: 1.42;
+  }
+
+  /*
+   * Typographic orphans: `balance` stops a heading from dropping its last word
+   * onto a line of its own (the hero used to break “Sri Ganesh… / Jewellers”
+   * with one word on the second line), and `pretty` does the quieter version of
+   * the same for paragraphs. Both are progressive — an older browser ignores them.
+   */
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p,
+  li {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--color-gold) 35%, transparent);
+    color: var(--color-charcoal);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-maroon);
+    outline-offset: 2px;
+    border-radius: 2px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* Page gutter container */
+  .container-page {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Thin gold hairline separator */
+  .hairline {
+    border-top: 1px solid color-mix(in srgb, var(--color-gold) 45%, transparent);
+  }
+
+  /* Ornamental gold divider used under section headings */
+  .ornament {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .ornament::before,
+  .ornament::after {
+    content: "";
+    width: 3.25rem;
+    height: 1px;
+    background: linear-gradient(
+      to var(--ornament-direction, right),
+      transparent,
+      color-mix(in srgb, var(--color-gold) 85%, transparent)
+    );
+  }
+  .ornament::before {
+    --ornament-direction: left;
+  }
+
+  /*
+   * One warm grade for every photograph on the storefront. The stock photos come
+   * from many different cameras — cold fluorescent showroom shots next to warm
+   * studio ones — and the owner's photos will differ again. A single filter keeps
+   * them reading as one set: a touch more warmth, a hair more contrast, slightly
+   * pulled-back saturation so gold reads as gold and not as neon.
+   */
+  .photo-warm {
+    filter: saturate(1.04) contrast(1.04) brightness(1.01) sepia(0.08);
+  }
+
+  /* Gentle 3D lift for collection tiles; pair with `group` + perspective. */
+  .tilt-card {
+    transform-style: preserve-3d;
+    transition:
+      transform 700ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .tilt-card:hover {
+      transform: perspective(900px) rotateX(2.5deg) rotateY(-3deg) translateY(-4px);
+      box-shadow: var(--shadow-lift);
+    }
+  }
+
+  /* Hero light sweep — the only decorative gradient animation on the site */
+  .light-sweep {
+    position: relative;
+    overflow: hidden;
+  }
+  .light-sweep::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 35%,
+      color-mix(in srgb, #fff 18%, transparent) 48%,
+      transparent 61%
+    );
+    transform: translateX(-120%);
+    animation: sweep 7.5s ease-in-out 1.2s infinite;
+    pointer-events: none;
+  }
+}
+
+@keyframes sweep {
+  0% {
+    transform: translateX(-120%);
+  }
+  55%,
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+/* ==========================================================================
+   Cinematic intro
+   A 3D gyroscope of gold rings, drifting dust and film grain — built from CSS
+   and one canvas, so it needs no video file and no third-party media.
+   ========================================================================== */
+
+.intro-grain {
+  opacity: 0.16;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+}
+
+.intro-rig {
+  transform-style: preserve-3d;
+  perspective: 900px;
+}
+
+.intro-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--color-gold) 65%, transparent);
+  transform-style: preserve-3d;
+}
+
+.intro-ring--outer {
+  inset: 0;
+  animation: intro-spin-a 26s linear infinite;
+  box-shadow: 0 0 48px color-mix(in srgb, var(--color-gold) 25%, transparent);
+}
+
+.intro-ring--mid {
+  inset: 13%;
+  border-style: dashed;
+  opacity: 0.75;
+  animation: intro-spin-b 18s linear infinite reverse;
+}
+
+.intro-ring--inner {
+  inset: 26%;
+  animation: intro-spin-c 13s linear infinite;
+  border-color: color-mix(in srgb, var(--color-champagne) 75%, transparent);
+}
+
+.intro-core {
+  position: absolute;
+  inset: 34%;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 25%, #2a2114, #100d08 70%);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-gold) 45%, transparent),
+    0 18px 60px -12px rgba(0, 0, 0, 0.9),
+    inset 0 0 30px rgba(201, 164, 92, 0.18);
+  animation: intro-breathe 6s ease-in-out infinite;
+}
+
+.intro-spark {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--color-champagne);
+  box-shadow: 0 0 12px 3px color-mix(in srgb, var(--color-gold) 55%, transparent);
+}
+.intro-spark--a {
+  left: 6%;
+  top: 18%;
+  animation: intro-float 7s ease-in-out infinite;
+}
+.intro-spark--b {
+  right: 2%;
+  bottom: 26%;
+  animation: intro-float 9s ease-in-out 0.8s infinite;
+}
+.intro-spark--c {
+  left: 48%;
+  bottom: 2%;
+  animation: intro-float 8s ease-in-out 1.6s infinite;
+}
+
+.intro-in {
+  animation: intro-rise 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.intro-in-slow {
+  animation: intro-rise 1400ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both;
+}
+
+@keyframes intro-spin-a {
+  from {
+    transform: rotateX(68deg) rotateZ(0deg);
+  }
+  to {
+    transform: rotateX(68deg) rotateZ(360deg);
+  }
+}
+@keyframes intro-spin-b {
+  from {
+    transform: rotateX(64deg) rotateY(16deg) rotateZ(0deg);
+  }
+  to {
+    transform: rotateX(64deg) rotateY(16deg) rotateZ(360deg);
+  }
+}
+@keyframes intro-spin-c {
+  from {
+    transform: rotateX(74deg) rotateY(-18deg) rotateZ(0deg);
+  }
+  to {
+    transform: rotateX(74deg) rotateY(-18deg) rotateZ(360deg);
+  }
+}
+@keyframes intro-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translate3d(4px, -14px, 30px);
+    opacity: 1;
+  }
+}
+@keyframes intro-breathe {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--color-gold) 45%, transparent),
+      0 18px 60px -12px rgba(0, 0, 0, 0.9),
+      inset 0 0 30px rgba(201, 164, 92, 0.18);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--color-gold) 70%, transparent),
+      0 18px 70px -8px rgba(0, 0, 0, 0.95),
+      inset 0 0 46px rgba(201, 164, 92, 0.35);
+  }
+}
+@keyframes intro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.6s ease-out both;
+}
+
+/* Respect reduced motion everywhere */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

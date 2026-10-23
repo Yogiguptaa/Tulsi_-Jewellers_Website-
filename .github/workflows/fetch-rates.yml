@@ -1,0 +1,45 @@
+# Automatic daily rates — safety net alongside Vercel Cron.
+#
+# Two triggers, one job:
+#   04:00 UTC = 09:30 IST   the normal daily run
+#   05:00 UTC = 10:30 IST   a retry in case the first run failed, which does
+#                           nothing (and spends no API call) when today's rates
+#                           are already stored — the endpoint is idempotent.
+#
+# Required repository secrets (Settings → Secrets and variables → Actions):
+#   SITE_URL      e.g. https://tulsijewellersnagpur.com  (no trailing slash)
+#   CRON_SECRET   the same value set in Vercel; a long random string
+#
+# The API key itself never appears here: it lives only in Vercel's environment
+# variables, and the endpoint refuses to run without CRON_SECRET.
+
+name: Fetch gold and silver rates
+
+on:
+  schedule:
+    - cron: "0 4 * * *"
+    - cron: "0 5 * * *"
+  workflow_dispatch: {}
+
+concurrency:
+  group: fetch-rates
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check configuration
+        run: |
+          if [ -z "${{ secrets.SITE_URL }}" ] || [ -z "${{ secrets.CRON_SECRET }}" ]; then
+            echo "::error::Set the SITE_URL and CRON_SECRET repository secrets before relying on this schedule."
+            exit 1
+          fi
+
+      - name: Trigger the rate job
+        run: |
+          # -sS keeps curl quiet but shows real errors; -f fails the step on 4xx/5xx.
+          # The response body carries only status, counts and reasons — never a key.
+          curl -sS -f -X POST \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.SITE_URL }}/api/cron/fetch-rates"

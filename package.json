@@ -2,25 +2,44 @@
   "name": "tulsi-scaffold",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node ./node_modules/next/dist/bin/next build",
+    "verify": "node scripts/check-placeholders.mjs && node ./node_modules/typescript/lib/tsc.js --noEmit && node ./node_modules/eslint/bin/eslint.js src --max-warnings=0",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "node ./node_modules/eslint/bin/eslint.js src --max-warnings=0",
+    "check:types": "node ./node_modules/typescript/lib/tsc.js --noEmit",
+    "check:placeholders": "node scripts/check-placeholders.mjs",
+    "check:rates": "node scripts/check-rate-provider.mjs",
+    "rates:fetch": "node scripts/fetch-rates.mjs",
+    "sync:media": "node scripts/sync-media.ts",
+    "media:manifest": "node scripts/build-media-manifest.mjs",
+    "qr": "node scripts/generate-qr.mjs"
   },
   "dependencies": {
-    "next": "16.4.0",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.117.3",
+    "framer-motion": "^14.0.0",
+    "lucide-react": "^1.53.0",
+    "next": "16.4.2",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "1.20.12",
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.4.0",
+    "eslint-config-next": "16.4.2",
+    "qrcode": "^1.5.4",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "4.148.0"
   }
 }

@@ -1,0 +1,46 @@
+# netlify.toml — deploy settings for Netlify.
+#
+# Netlify detects Next.js from package.json and runs its OpenNext-based runtime
+# automatically. The adapter is deliberately NOT pinned in package.json: Netlify
+# recommends leaving it unpinned so every build picks up the newest adapter,
+# which is what keeps up with Next 16 (Cache Components, Turbopack, Proxy).
+#
+# Set these in Site configuration → Environment variables before the first build:
+#   NEXT_PUBLIC_SITE_URL          https://<your-site>.netlify.app (or your domain)
+#   NEXT_PUBLIC_SUPABASE_URL      (optional — see DEPLOY.md)
+#   NEXT_PUBLIC_SUPABASE_ANON_KEY
+#   SUPABASE_SERVICE_ROLE_KEY
+#   CRON_SECRET                   required only for the daily rate job
+#   METALS_DEV_API_KEY            optional rate provider
+#
+# NEXT_PUBLIC_SITE_URL is baked into canonical tags, the sitemap and the share
+# card at BUILD time. Without it the deployed pages would advertise localhost.
+#
+# The daily rate refresh is not a Netlify Scheduled Function: the existing
+# .github/workflows/fetch-rates.yml calls /api/cron/fetch-rates with
+# `Authorization: Bearer $CRON_SECRET`, which works on Netlify, Vercel or any
+# host. Add SITE_URL and CRON_SECRET as GitHub repository secrets.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+  NEXT_TELEMETRY_DISABLED = "1"
+
+# Mirror next.config.ts security headers so static assets served straight from
+# the CDN carry them too (next.config.ts headers only run through the handler).
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "DENY"
+    Content-Security-Policy = "frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self'"
+    Permissions-Policy = "geolocation=(self), camera=(), microphone=(), payment=(), usb=()"
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains"
+
+# The image optimizer, Next static chunks and fonts are content-hashed by the
+# build; the adapter already sets long-lived caching, so no rules are added here
+# that could conflict with it.
