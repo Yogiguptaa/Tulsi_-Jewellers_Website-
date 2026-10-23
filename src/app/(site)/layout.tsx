@@ -1,8 +1,8 @@
 import SiteFrame from "@/components/layout/SiteFrame";
 
 /**
- * Everything a visitor sees lives under this route group: header, announcement
- * bar, footer, mobile bar and the WhatsApp button. (The old floating "View
+ * Everything a visitor sees lives under this route group: header, footer, mobile
+ * bar and the WhatsApp button. (The old floating "View
  * Rates" chip is gone: the mobile bar already carries a Rates tab, and the chip
  * sat on top of page content.)
  *

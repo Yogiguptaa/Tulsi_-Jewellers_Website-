@@ -92,9 +92,6 @@ export const hi: Dictionary = {
   "mega.title": "संग्रह",
   "mega.viewAll": "सभी संग्रह देखें",
 
-  /* Announcement bar */
-  "announcement.label": "सूचना",
-
   /* Footer */
   "footer.contact": "संपर्क",
   "footer.hours": "खुलने का समय",

@@ -54,12 +54,12 @@ owner (credentials, domain, real photos).
 - [x] `check:placeholders`, typecheck, eslint and `next build` exit 0, no warnings.
 - [x] Mobile 390 px and desktop checked in the running production build; no console errors on the public routes.
 - [x] RLS policies and security headers written; anonymous write paths and admin protection verified in code.
-- [ ] Live RLS execution and Lighthouse on a deployed URL need Supabase/domain — listed in `LAUNCH_CHECKLIST.md`.
+- [ ] Live RLS execution and Lighthouse on a deployed URL need Supabase/domain — listed in `docs/LAUNCH_CHECKLIST.md`.
 
 ### PHASE 5 — deploy ✅ (guide written, deployment not performed)
 
-- [x] `DEPLOY.md` (GitHub → Supabase SQL order → env vars → Vercel → cron → domain → QR → first-run checks).
-- [x] `LAUNCH_CHECKLIST.md` lists every fact, account and asset the owner must supply.
+- [x] `docs/DEPLOY.md` (GitHub → Supabase SQL order → env vars → Vercel → cron → domain → QR → first-run checks).
+- [x] `docs/LAUNCH_CHECKLIST.md` lists every fact, account and asset the owner must supply.
 
 ---
 
@@ -105,7 +105,7 @@ owner (credentials, domain, real photos).
 | 3 | Useful modern features | ✅ **DONE** (gaps listed at the end) |
 | 4 | Trust, SEO, security, launch | ✅ **DONE** |
 
-**All four parts complete (2026-10-17). Next action: work `LAUNCH_CHECKLIST.md` §1
+**All four parts complete (2026-10-17). Next action: work `docs/LAUNCH_CHECKLIST.md` §1
 (business facts) and §3 (Supabase), then §4 (first rate run).**
 
 ### Part 1 — what was built
@@ -176,7 +176,7 @@ owner (credentials, domain, real photos).
   `Permissions-Policy`, HSTS) and `poweredByHeader: false`. A full `script-src`
   policy needs nonces and is deliberately not guessed at.
 - `src/app/opengraph-image.tsx` — branded default share card.
-- `LAUNCH_CHECKLIST.md` — the ordered launch sequence, including the RLS checks that
+- `docs/LAUNCH_CHECKLIST.md` — the ordered launch sequence, including the RLS checks that
   were never run here and the deliberate gaps.
 
 ### Still not done (deliberate, listed in LAUNCH_CHECKLIST.md §9)

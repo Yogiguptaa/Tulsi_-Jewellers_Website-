@@ -2,8 +2,8 @@
  * content/public-content.ts — SERVER-ONLY reads of admin-managed content.
  *
  * These are the *only* place the public site learns about rows the admin panel
- * writes, so "approve a review" or "activate an announcement" really does change
- * what a visitor sees.
+ * writes, so "approve a review" or "activate an FAQ" really does change what a
+ * visitor sees.
  *
  * Two rules, both about honesty:
  *  • An empty table is not an error — each function falls back to the built-in
@@ -16,61 +16,9 @@
  */
 
 import { cacheLife, cacheTag } from "next/cache";
-import type { LocalizedText } from "@/lib/config";
 import { publicSupabase } from "@/lib/supabase/public";
 import { FAQ_ITEMS, type FaqItem } from "./faq";
 import type { Review } from "./reviews";
-
-/* -------------------------------------------------------------------------- */
-/* Announcements                                                               */
-/* -------------------------------------------------------------------------- */
-
-type AnnouncementRow = {
-  message_en: string;
-  message_hi: string;
-  starts_at: string | null;
-  ends_at: string | null;
-};
-
-/**
- * The single announcement to show in the top bar, or null to show the brand
- * tagline instead. Rows outside their `starts_at`/`ends_at` window are skipped,
- * which is how a seasonal notice expires without anyone remembering to remove it.
- *
- * Cache note: the window is evaluated when the cached value is built, so a notice
- * may stay on screen up to the cache lifetime (`cacheLife("minutes")`) past its
- * end time — and an edit in /admin invalidates it immediately.
- */
-export async function getActiveAnnouncement(): Promise<LocalizedText | null> {
-  "use cache";
-  cacheLife("minutes");
-  cacheTag("announcements");
-
-  const supabase = publicSupabase();
-  if (!supabase) return null;
-
-  try {
-    const now = new Date().toISOString();
-    const { data, error } = await supabase
-      .from("announcements")
-      .select("message_en, message_hi, starts_at, ends_at")
-      .eq("is_active", true)
-      .order("sort_order", { ascending: true })
-      .order("created_at", { ascending: false });
-
-    if (error || !data) return null;
-
-    const live = (data as AnnouncementRow[]).find(
-      (row) =>
-        (!row.starts_at || row.starts_at <= now) && (!row.ends_at || row.ends_at >= now),
-    );
-    if (!live) return null;
-
-    return { en: live.message_en, hi: live.message_hi };
-  } catch {
-    return null;
-  }
-}
 
 /* -------------------------------------------------------------------------- */
 /* Reviews                                                                     */

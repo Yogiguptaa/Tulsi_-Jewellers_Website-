@@ -34,8 +34,20 @@ export const SITE = {
     en: "आपका विश्वास, हमारी पहचान",
     hi: "आपका विश्वास, हमारी पहचान",
   } satisfies LocalizedText,
-  /** Base URL used for canonical/OG tags. Set NEXT_PUBLIC_SITE_URL in production. */
-  baseUrl: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  /**
+   * Base URL used for canonical/OG tags. Set NEXT_PUBLIC_SITE_URL in production.
+   *
+   * If that variable is forgotten, a Vercel build still resolves its own domain
+   * (the project's production URL, or the deployment URL for a preview) instead of
+   * publishing `localhost` in every canonical tag.
+   */
+  baseUrl:
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : "http://localhost:3000"),
   /** Swap to "/logo.png" once the supplied emblem file is added to /public. */
   logoSrc: "/logo.svg",
   logoAlt: {

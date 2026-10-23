@@ -177,14 +177,13 @@ What you can do there, and what the public site does in response:
 | Rates | `/rates`, `/rates/history`, the home-page ticker | nothing publishes unless the value passes the same checks the automated feed uses |
 | Products | `/collections`, `/products/<slug>`, the home page | a draft/archived product is invisible to visitors; the first gallery line becomes the main photo |
 | Collections | `/collections`, the header menu | a collection holding products cannot be deleted |
-| Announcements | the bar above the header | both languages required; start/end dates expire it automatically |
 | FAQs | `/faq` and its FAQ structured data | once any row is active, the database replaces the built-in answers |
 | Reviews | the home page | approve a review and it appears; samples disappear when genuine ones exist |
 | Pricing rules | `/rates/calculator` | `owner` only; a rule marked public is shown to visitors, otherwise the calculator stays metal-value-only |
 | Enquiries | nothing (internal) | no export of customer details is provided, by design |
 
 Roles: `owner` can do everything; `staff` can read everything and edit products, rates,
-announcements, FAQs and enquiry status, but cannot delete records or change pricing rules.
+FAQs and enquiry status, but cannot delete records or change pricing rules.
 
 ---
 

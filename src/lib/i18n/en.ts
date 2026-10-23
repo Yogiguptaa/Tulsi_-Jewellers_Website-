@@ -95,9 +95,6 @@ export const en = {
   "mega.title": "Collections",
   "mega.viewAll": "Browse all collections",
 
-  /* Announcement bar */
-  "announcement.label": "Notice",
-
   /* Footer */
   "footer.contact": "Contact",
   "footer.hours": "Opening hours",

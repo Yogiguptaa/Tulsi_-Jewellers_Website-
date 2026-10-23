@@ -18,7 +18,6 @@ const SECTIONS: Section[] = [
   { href: "/admin/products", label: "Products" },
   { href: "/admin/categories", label: "Collections" },
   { href: "/admin/enquiries", label: "Enquiries" },
-  { href: "/admin/announcements", label: "Announcements" },
   { href: "/admin/faqs", label: "FAQs" },
   { href: "/admin/reviews", label: "Reviews" },
   { href: "/admin/pricing-rules", label: "Pricing rules" },

@@ -30,13 +30,26 @@ cp .env.example .env.local     # then fill it in (see below)
 npm run dev                    # http://localhost:3000
 ```
 
+## Folder structure
+
+```
+src/app/            routes — (site) is the public site, admin/ is the panel, api/ the endpoints
+src/components/     layout, catalogue, rates, content, admin, ui
+src/lib/            config, content, catalogue, rates, supabase, i18n, admin (all logic)
+public/             logo, icons, photos and the media manifest
+scripts/            build-time and check scripts
+supabase/           schema.sql, migrations/, seed.sql, RLS testing notes
+docs/               everything explanatory: deploy, launch, architecture, owner checklist
+```
+
 Production checks, in this order:
 
 ```bash
-npm run check:types   # tsc --noEmit
-npm run lint          # eslint
-npm run build         # next build
-npm start             # next start -p 3210
+npm run check:placeholders   # must print ✓
+npm run check:types          # tsc --noEmit
+npm run lint                 # eslint src --max-warnings=0
+npm run verify               # the three above, in one command
+npm run build                # next build
 ```
 
 ## Environment variables
@@ -156,7 +169,7 @@ Any Next.js host works. Three are configured:
   security headers, and Netlify installs its Next.js runtime automatically. There is no platform
   cron there, so the GitHub Action does the daily refresh.
 - **Freebuff Sites** — the current public deployment, built as a Cloudflare Worker through
-  OpenNext (see `DEPLOY.md`).
+  OpenNext (see `docs/DEPLOY.md`).
 
 Set every environment variable for Production first — `NEXT_PUBLIC_SITE_URL` is read at build time.
 After the first deploy, run `/api/cron/fetch-rates` once from **Admin → Rates → Run now** and check
@@ -167,9 +180,10 @@ the *Feed status* card.
 | File | Contents |
 | --- | --- |
 | `CONTEXT.md` | build log: what exists, decisions, stage status |
+| `docs/DEPLOY.md` | step-by-step deploy to Vercel, Netlify, Freebuff Sites, plus the domain |
+| `docs/LAUNCH_CHECKLIST.md` | the launch sequence, in order |
 | `docs/ARCHITECTURE.md` | sitemap, design system, data model, security, SEO |
 | `docs/RATE_PROVIDER.md` | provider setup, cost, licence terms to confirm before going live |
 | `docs/OWNER_CHECKLIST.md` | every business fact, image and account the owner must supply |
 | `docs/PHOTO_GUIDE.md` | replacing the licensed photographs with the showroom's own |
 | `docs/MEDIA_GUIDE.md` | manifest, sizes and credits for every image the site ships |
-| `LAUNCH_CHECKLIST.md` | the launch sequence, in order |

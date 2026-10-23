@@ -7,14 +7,12 @@
  * a blocking prerender. Now the route groups decide which chrome a route gets,
  * and this component only assembles the pieces.
  *
- * Both reads are `"use cache"` (the announcement from the database, the copyright
- * year from the clock), so the frame itself can still be prerendered.
+ * The copyright year is read with `"use cache"`, so the frame itself can still be
+ * prerendered.
  */
 
 import type { ReactNode } from "react";
-import { getActiveAnnouncement } from "@/lib/content/public-content";
 import { getCopyrightYear } from "@/lib/year";
-import AnnouncementBar from "./AnnouncementBar";
 import Header from "./Header";
 import Footer from "./Footer";
 import MobileBottomBar from "./MobileBottomBar";
@@ -24,15 +22,11 @@ import CinematicIntro from "@/components/intro/CinematicIntro";
 import ScrollProgress from "./ScrollProgress";
 
 export default async function SiteFrame({ children }: { children: ReactNode }) {
-  const [announcement, year] = await Promise.all([
-    getActiveAnnouncement(),
-    getCopyrightYear(),
-  ]);
+  const year = await getCopyrightYear();
 
   return (
     <>
       <ScrollProgress />
-      <AnnouncementBar message={announcement ?? undefined} />
       <Header />
       <main id="main-content" className="min-h-[60vh] pb-24 lg:pb-0">
         {children}

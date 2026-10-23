@@ -189,18 +189,8 @@ export const categorySchema = z.object({
 });
 
 /* -------------------------------------------------------------------------- */
-/* Announcements / FAQs / reviews / pricing rules                              */
+/* FAQs / reviews / pricing rules                                              */
 /* -------------------------------------------------------------------------- */
-
-export const announcementSchema = z.object({
-  id: optionalUuid,
-  message_en: z.string().trim().min(2, "The English message is required.").max(300),
-  message_hi: z.string().trim().min(2, "The Hindi message is required.").max(300),
-  is_active: z.boolean(),
-  starts_at: z.string().trim().max(40).optional(),
-  ends_at: z.string().trim().max(40).optional(),
-  sort_order: z.number().int().min(0).max(9999),
-});
 
 export const faqSchema = z.object({
   id: optionalUuid,

@@ -29,7 +29,6 @@ import { readUsage } from "@/lib/rates/usage";
 import { getAdminGate, isOwner, type AdminIdentity } from "./auth";
 import { fail, explainDbError, ok, type AdminActionResult } from "./result";
 import {
-  announcementSchema,
   categorySchema,
   checkbox,
   faqSchema,
@@ -657,67 +656,6 @@ export async function deleteEnquiry(
     if (error) return dbError(error);
     publish(["/admin/enquiries"], []);
     return ok("Enquiry deleted.");
-  }, { ownerOnly: true });
-}
-
-/* -------------------------------------------------------------------------- */
-/* Announcements                                                               */
-/* -------------------------------------------------------------------------- */
-
-export async function saveAnnouncement(
-  _prev: AdminActionResult,
-  data: FormData,
-): Promise<AdminActionResult> {
-  return asAdmin(async (supabase) => {
-    const parsed = announcementSchema.safeParse({
-      id: text(data, "id"),
-      message_en: text(data, "message_en"),
-      message_hi: text(data, "message_hi"),
-      is_active: checkbox(data, "is_active"),
-      starts_at: text(data, "starts_at"),
-      ends_at: text(data, "ends_at"),
-      sort_order: optionalNumber(data, "sort_order") ?? 0,
-    });
-    if (!parsed.success) {
-      const errors = fieldErrors(parsed.error);
-      return fail(parsed.error.issues[0]?.message ?? "Check the fields.", errors);
-    }
-    const input = parsed.data;
-
-    // A blank datetime means "no bound", which the column allows.
-    const values = {
-      message_en: input.message_en,
-      message_hi: input.message_hi,
-      is_active: input.is_active,
-      starts_at: input.starts_at ? new Date(input.starts_at).toISOString() : null,
-      ends_at: input.ends_at ? new Date(input.ends_at).toISOString() : null,
-      sort_order: input.sort_order,
-    };
-
-    if (input.id) {
-      const { error } = await supabase.from("announcements").update(values).eq("id", input.id);
-      if (error) return dbError(error);
-    } else {
-      const { error } = await supabase.from("announcements").insert(values);
-      if (error) return dbError(error);
-    }
-
-    publish(["/admin/announcements", "/"], ["announcements"]);
-    return ok("Announcement saved.");
-  });
-}
-
-export async function deleteAnnouncement(
-  _prev: AdminActionResult,
-  data: FormData,
-): Promise<AdminActionResult> {
-  return asAdmin(async (supabase) => {
-    const id = text(data, "id");
-    if (!id) return fail("Missing announcement id.");
-    const { error } = await supabase.from("announcements").delete().eq("id", id);
-    if (error) return dbError(error);
-    publish(["/admin/announcements", "/"], ["announcements"]);
-    return ok("Announcement deleted.");
   }, { ownerOnly: true });
 }
 
