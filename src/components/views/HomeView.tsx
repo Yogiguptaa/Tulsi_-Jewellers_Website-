@@ -18,6 +18,7 @@ import {
   ROUTES,
   SCHEME,
   SITE,
+  isPlaceholder,
   pick,
   telDisplay,
   telHref,
@@ -35,7 +36,6 @@ import { buttonClasses } from "@/components/ui/Button";
 import SectionHeading from "@/components/ui/SectionHeading";
 import Accordion from "@/components/ui/Accordion";
 import ProductGrid from "@/components/catalogue/ProductGrid";
-import EmptyCatalogue from "@/components/catalogue/EmptyCatalogue";
 import RateTicker from "@/components/rates/RateTicker";
 import type { ApiRatesPayload } from "@/lib/rates/api-payload";
 import TrustGrid from "@/components/content/TrustGrid";
@@ -218,33 +218,32 @@ export default function HomeView({
         </div>
       </section>
 
-      {/* Design inspiration — explicitly not inventory */}
+      {/* Featured — only real published pieces. With none, the entire section
+          is omitted: an empty "New designs arriving" box read as an unfinished
+          page, so the popular-designs strip takes its place instead. */}
+      {featured.length > 0 && source !== "empty" ? (
+        <section className="container-page py-14 sm:py-16">
+          <SectionHeading
+            kicker={t("home.featuredKicker")}
+            title={t("home.featuredTitle")}
+            subtitle={t("home.featuredSubtitle")}
+          />
+          <div className="mt-8">
+            <ProductGrid products={featured} />
+          </div>
+          <div className="mt-8 text-center">
+            <Link href={ROUTES.collections} className={buttonClasses("secondary", "md")}>
+              {t("common.showAll")} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </div>
+        </section>
+      ) : null}
+
+      {/* Popular designs — style, not stock. */}
       <TrendingStyles />
 
       {/* The bangle room: a mosaic of four styles, each with its own enquiry. */}
       <BangleShowcase />
-
-      {/* Featured */}
-      <section className="container-page py-14 sm:py-16">
-        <SectionHeading
-          kicker={t("home.featuredKicker")}
-          title={t("home.featuredTitle")}
-          subtitle={t("home.featuredSubtitle")}
-        />
-        {featured.length === 0 || source === "empty" ? (
-          <div className="mt-6">
-            <EmptyCatalogue />
-          </div>
-        ) : null}
-        <div className="mt-8">
-          <ProductGrid products={featured} />
-        </div>
-        <div className="mt-8 text-center">
-          <Link href={ROUTES.collections} className={buttonClasses("secondary", "md")}>
-            {t("common.showAll")} <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </Link>
-        </div>
-      </section>
 
       {/* Scheme */}
       <section className="bg-maroon text-offwhite">
@@ -303,7 +302,14 @@ export default function HomeView({
           <dl className="space-y-2 text-sm">
             <div className="flex gap-2">
               <dt className="w-24 shrink-0 text-charcoal/70">{t("visit.addressTitle")}</dt>
-              <dd className="text-charcoal/85">{pick(CONTACT.area, lang)}</dd>
+              <dd className="text-charcoal/85">
+                {/* One address, from config: the same street address the header,
+                    footer, schema and metadata print. The locality is only a
+                    fallback while the full address is a placeholder. */}
+                {isPlaceholder(pick(CONTACT.address, lang))
+                  ? pick(CONTACT.area, lang)
+                  : pick(CONTACT.address, lang)}
+              </dd>
             </div>
             <div className="flex gap-2">
               <dt className="w-24 shrink-0 text-charcoal/70">{t("visit.hoursTitle")}</dt>

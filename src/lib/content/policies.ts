@@ -208,7 +208,7 @@ export const POLICIES: Policy[] = [
         body: [
           { en: RATE_DISCLAIMER, hi: RATE_DISCLAIMER },
           {
-            en: "Where a rate is described as a published benchmark, it is the latest rate the showroom has recorded from the stated source, shown with its date, time and session. Rates shown are not an offer to sell at that price and may change during the day.",
+            en: "A rate shown on this site is the latest rate the showroom has recorded from the stated source, shown with its date, time and session. Rates are not an offer to sell at that price and may change during the day.",
             hi: "जहाँ किसी भाव को ‘प्रकाशित बेंचमार्क’ कहा गया है, वह शोरूम द्वारा बताए गए स्रोत से दर्ज नवीनतम भाव है, जिसके साथ दिनांक, समय और सत्र दिखाया जाता है। दिखाया गया भाव उस कीमत पर बिक्री का प्रस्ताव नहीं है और दिन में बदल सकता है।",
           },
         ],

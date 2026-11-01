@@ -8,7 +8,7 @@ import JsonLd from "@/components/seo/JsonLd";
 export const metadata: Metadata = buildMetadata({
   title: "Metal Value Calculator — From Today's Rate | Tulsi Jewellers",
   description:
-    "Estimate the metal value of a gold or silver piece from our published benchmark rate. An estimate of metal value only — never a price and never a quotation.",
+    "Estimate the metal value of a gold or silver piece from today's published rate. An estimate of metal value only — never a price and never a quotation.",
   path: "/rates/calculator",
   keywords: ["gold value calculator Nagpur", "jewellery metal value calculator", "gold price calculator India"],
 });

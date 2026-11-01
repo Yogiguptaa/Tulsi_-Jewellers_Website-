@@ -14,7 +14,9 @@ import { SITE } from "@/lib/config";
 export default function SiteLoading() {
   return (
     <div className="container-page space-y-10 py-16" aria-busy="true" aria-live="polite">
-      <span className="sr-only">Loading…</span>
+      {/* No "Loading…" label: the skeleton is the indicator, and `aria-busy` tells
+          assistive technology the page is still arriving. A visible (or hidden)
+          word here would still be text on the page. */}
 
       <div className="flex items-center gap-3">
         {/* eslint-disable-next-line @next/next/no-img-element -- SVG mark, same asset the header uses */}

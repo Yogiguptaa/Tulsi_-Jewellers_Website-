@@ -18,7 +18,7 @@ import { imageSrc } from "@/lib/catalogue/images";
 export const metadata: Metadata = buildMetadata({
   title: "Tulsi Jewellers — Jewellery Showroom in Hansapuri, Nagpur",
   description:
-    "Gold jewellery, silver, gold coins and ratna (gems) at Tulsi Jewellers, Hansapuri, Nagpur — with today's benchmark rate and a scheme from ₹499 a month.",
+    "Gold jewellery, silver, gold coins and ratna (gems) at Tulsi Jewellers, Hansapuri, Nagpur — with today's gold and silver rate and a scheme from ₹499 a month.",
   path: "/",
   image: imageSrc("showroomAsian"),
   keywords: [

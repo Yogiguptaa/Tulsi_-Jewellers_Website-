@@ -18,7 +18,6 @@ import Footer from "./Footer";
 import MobileBottomBar from "./MobileBottomBar";
 import WhatsAppFab from "./WhatsAppFab";
 import CommandPalette from "@/components/search/CommandPalette";
-import CinematicIntro from "@/components/intro/CinematicIntro";
 import ScrollProgress from "./ScrollProgress";
 
 export default async function SiteFrame({ children }: { children: ReactNode }) {
@@ -37,8 +36,6 @@ export default async function SiteFrame({ children }: { children: ReactNode }) {
       {/* ⌘K / Ctrl+K (or "/") quick search. Client-only and mounted once, so it
           adds no data fetching to any page. */}
       <CommandPalette />
-      {/* Plays once per browser, always skippable, respects reduced motion. */}
-      <CinematicIntro />
     </>
   );
 }

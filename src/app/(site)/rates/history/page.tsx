@@ -10,7 +10,7 @@ const HISTORY_DAYS = 90;
 export const metadata: Metadata = buildMetadata({
   title: "Gold & Silver Rate History | Tulsi Jewellers",
   description:
-    "Day-by-day gold and silver benchmarks recorded by Tulsi Jewellers, Nagpur — plotted only from the values the showroom actually recorded.",
+    "Day-by-day gold and silver rates recorded by Tulsi Jewellers, Nagpur — plotted only from the values the showroom actually recorded.",
   path: "/rates/history",
   keywords: ["gold rate history Nagpur", "gold price chart Nagpur", "silver rate history Nagpur"],
 });
@@ -19,7 +19,7 @@ export default async function RateHistoryPage() {
   const history = await getRateHistory(HISTORY_DAYS);
   const notice = history.available
     ? null
-    : "No benchmark rate has been recorded for this period yet. The chart shows data only once the showroom publishes a rate.";
+    : "No rate has been recorded for this period yet. The chart shows data only once the showroom publishes a rate.";
 
   return (
     <>

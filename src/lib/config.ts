@@ -347,7 +347,7 @@ export const RATE_DISCLAIMER =
  * the counter, so any number here would be invented.
  */
 export const MAKING_CHARGES_NOTE =
-  "Making charges vary by design and quality, finalised at the shop when you choose your piece.";
+  "Making charges vary by design and quality and are finalised at the shop.";
 
 export const RATE_STALE_MESSAGE = "Latest verified rate temporarily unavailable";
 
@@ -373,6 +373,7 @@ export const RATE_ATTRIBUTION = {
 export const ROUTES = {
   home: "/",
   collections: "/collections",
+  designs: "/designs",
   rates: "/rates",
   scheme: "/gold-saving-scheme",
   gems: "/gems",

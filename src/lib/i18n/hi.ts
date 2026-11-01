@@ -22,6 +22,7 @@ export const hi: Dictionary = {
   /* Navigation */
   "nav.home": "होम",
   "nav.collections": "संग्रह",
+  "nav.designs": "लोकप्रिय डिज़ाइन",
   "nav.rates": "सोना और चांदी भाव",
   "nav.scheme": "गोल्ड सेविंग स्कीम",
   "nav.gems": "रत्न संग्रह",
@@ -80,8 +81,6 @@ export const hi: Dictionary = {
   "header.themeToNight": "रात की थीम चुनें",
   "header.themeToDay": "दिन की थीम चुनें",
   "intro.skip": "इंट्रो छोड़ें",
-  "intro.replay": "इंट्रो देखें",
-  "intro.replayHint": "सोने, चांदी और उनकी कारीगरी पर तीस सेकंड की छोटी फ़िल्म।",
   "header.switchToHindi": "हिंदी",
   "header.switchToEnglish": "English",
   "header.skipToContent": "मुख्य सामग्री पर जाएँ",
@@ -255,8 +254,9 @@ export const hi: Dictionary = {
   "home.trendingKicker": "डिज़ाइन प्रेरणा",
   "home.trendingTitle": "लोकप्रिय स्टाइल",
   "home.trendingNote":
-    "अगले गहने के लिए थोड़ी प्रेरणा। आज शोरूम में क्या है, हमसे पूछें।",
-  "home.trendingAsk": "इस स्टाइल के बारे में पूछें",
+    "लोकप्रिय डिज़ाइन। काउंटर पर क्या है यह अक्सर बदलता है: नवीनतम देखने के लिए हमें संदेश करें।",
+  "home.trendingAsk": "व्हाट्सऐप पर पूछें",
+  "home.designsSeeAll": "लोकप्रिय डिज़ाइन देखें",
 
   /* Bangles */
   "bangles.kicker": "चूड़ी-कक्ष",
@@ -266,7 +266,7 @@ export const hi: Dictionary = {
   "bangles.cta": "सोने का संग्रह देखें",
   "bangles.ask": "चूड़ियों के बारे में पूछें",
   "bangles.footnote":
-    "यह डिज़ाइन प्रेरणा है, स्टॉक सूची नहीं। हर तस्वीर का श्रेय image-credits पेज पर दर्ज है।",
+    "लोकप्रिय डिज़ाइन। काउंटर पर क्या है यह अक्सर बदलता है: नवीनतम देखने के लिए हमें संदेश करें। हर तस्वीर का श्रेय image-credits पेज पर दर्ज है।",
 
   "rates.title": "सोना और चांदी भाव",
   "rates.kicker": "आज का सोना-चांदी भाव",

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Mail, MapPin, Phone, Clock, MessageCircle, Play } from "lucide-react";
+import { Mail, MapPin, Phone, Clock, MessageCircle } from "lucide-react";
 import type { ComponentType } from "react";
 
 /* Brand glyphs (lucide no longer ships social logos) */
@@ -39,7 +39,6 @@ import {
 } from "@/lib/config";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import { mediaProviders } from "@/lib/catalogue/images";
-import { INTRO_REPLAY_EVENT } from "@/components/intro/CinematicIntro";
 
 export default function Footer({ year }: { year: number }) {
   const { lang, t } = useLanguage();
@@ -64,21 +63,8 @@ export default function Footer({ year }: { year: number }) {
           </div>
           <p className="text-sm italic text-cream/70">{pick(SITE.tagline, lang)}</p>
           <p className="text-sm text-cream/70">{t("footer.areaNote")}</p>
-          {/* The thirty-second intro plays once per browser; this is the only
-              way back to it, so it lives with the brand rather than in a menu. */}
-          <div>
-            <button
-              type="button"
-              onClick={() => window.dispatchEvent(new Event(INTRO_REPLAY_EVENT))}
-              className="inline-flex items-center gap-2 rounded-sm border border-gold/40 px-3 py-2 text-xs font-medium text-cream transition-colors hover:border-gold hover:bg-gold/10"
-            >
-              <Play className="h-3.5 w-3.5" aria-hidden="true" />
-              {t("intro.replay")}
-            </button>
-            <p className="mt-1.5 max-w-[15rem] text-[11px] leading-relaxed text-cream/50">
-              {t("intro.replayHint")}
-            </p>
-          </div>
+          {/* There is no film to replay until the showroom supplies one, so this
+              block is omitted rather than advertising a video that does not exist. */}
           {socials.length > 0 ? (
             <div className="flex gap-3">
               {socials.map(({ label, href, icon: Icon }) => (
@@ -169,6 +155,7 @@ export default function Footer({ year }: { year: number }) {
           <ul className="space-y-2">
             {[
               { href: ROUTES.collections, label: t("nav.collections") },
+              { href: ROUTES.designs, label: t("nav.designs") },
               { href: ROUTES.rates, label: t("nav.rates") },
               { href: ROUTES.scheme, label: t("nav.scheme") },
               { href: ROUTES.gems, label: t("nav.gems") },

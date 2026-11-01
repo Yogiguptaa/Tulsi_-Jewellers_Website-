@@ -25,6 +25,7 @@ export const en = {
   /* Navigation */
   "nav.home": "Home",
   "nav.collections": "Collections",
+  "nav.designs": "Popular Designs",
   "nav.rates": "Gold & Silver Rates",
   "nav.scheme": "Gold Saving Scheme",
   "nav.gems": "Gems / Ratna",
@@ -83,8 +84,6 @@ export const en = {
   "header.themeToNight": "Switch to night theme",
   "header.themeToDay": "Switch to day theme",
   "intro.skip": "Skip intro",
-  "intro.replay": "Watch the intro",
-  "intro.replayHint": "A thirty-second film about gold, silver and the craft behind them.",
   "header.switchToHindi": "हिंदी",
   "header.switchToEnglish": "English",
   "header.skipToContent": "Skip to main content",
@@ -261,8 +260,9 @@ export const en = {
   "home.trendingKicker": "Design inspiration",
   "home.trendingTitle": "Trending styles",
   "home.trendingNote":
-    "A little inspiration for your next piece. Ask us what is in the showroom today.",
-  "home.trendingAsk": "Ask about this style",
+    "Popular designs. What is on the counter changes often: message us to see the latest.",
+  "home.trendingAsk": "Enquire on WhatsApp",
+  "home.designsSeeAll": "See popular designs",
 
   /* Bangles */
   "bangles.kicker": "The bangle room",
@@ -272,7 +272,7 @@ export const en = {
   "bangles.cta": "See the gold collection",
   "bangles.ask": "Ask about bangles",
   "bangles.footnote":
-    "Design inspiration, not stock. Every photograph is credited on the image-credits page.",
+    "Popular designs. What is on the counter changes often: message us to see the latest. Every photograph is credited on the image-credits page.",
 
   "rates.title": "Gold & Silver Rates",
   "rates.kicker": "Gold & silver today",
