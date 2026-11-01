@@ -463,6 +463,166 @@
         "page": "https://commons.wikimedia.org/wiki/File:Minoan_gold_necklace_archmus_Heraklion.jpg",
         "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Minoan_gold_necklace_archmus_Heraklion.jpg/1280px-Minoan_gold_necklace_archmus_Heraklion.jpg"
       }
+    },
+    {
+      "key": "jhumkaGold",
+      "src": "/media/stock/jhumkaGold.jpg",
+      "width": 1600,
+      "height": 2400,
+      "category": "earrings",
+      "alt": {
+        "en": "Pair of traditional jhumka earrings",
+        "hi": "पारंपरिक झुमका के जोड़े"
+      },
+      "credit": {
+        "provider": "Wikimedia Commons",
+        "title": "File:Jhumkas.jpg",
+        "creator": "Pragyajain98",
+        "license": "CC BY-SA 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+        "page": "https://commons.wikimedia.org/wiki/File:Jhumkas.jpg",
+        "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Jhumkas.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+      }
+    },
+    {
+      "key": "mangalsutraBeads",
+      "src": "/media/stock/mangalsutraBeads.jpg",
+      "width": 1600,
+      "height": 2111,
+      "category": "necklaces",
+      "alt": {
+        "en": "Mangalsutra of black beads with a gold pendant",
+        "hi": "सोने के पेंडेंट के साथ काले दानों का मंगलसूत्र"
+      },
+      "credit": {
+        "provider": "Wikimedia Commons",
+        "title": "File:Mangalsutra.png",
+        "creator": "Ackroydman",
+        "license": "CC BY-SA 3.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+        "page": "https://commons.wikimedia.org/wiki/File:Mangalsutra.png",
+        "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8d/Mangalsutra.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+      }
+    },
+    {
+      "key": "silverAnklets",
+      "src": "/media/stock/silverAnklets.jpg",
+      "width": 1600,
+      "height": 1206,
+      "category": "silver",
+      "alt": {
+        "en": "Antique Indian silver anklet with a gold wash",
+        "hi": "सोने की परत वाली पुरानी भारतीय चांदी की पायल"
+      },
+      "credit": {
+        "provider": "Wikimedia Commons",
+        "title": "File:Anklet from India, 19th century, silver with gold wash, HAA.JPG",
+        "creator": "Hiart",
+        "license": "CC0",
+        "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+        "page": "https://commons.wikimedia.org/wiki/File:Anklet_from_India,_19th_century,_silver_with_gold_wash,_HAA.JPG",
+        "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/0/08/Anklet_from_India%2C_19th_century%2C_silver_with_gold_wash%2C_HAA.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+      }
+    },
+    {
+      "key": "diamondRingWhite",
+      "src": "/media/stock/diamondRingWhite.jpg",
+      "width": 1600,
+      "height": 1066,
+      "category": "rings",
+      "alt": {
+        "en": "Gold ring set with a solitaire diamond",
+        "hi": "एक सॉलिटेयर हीरे जड़ी सोने की अंगूठी"
+      },
+      "credit": {
+        "provider": "Wikimedia Commons",
+        "title": "File:Diamond ring by Ernst Vikne.jpg",
+        "creator": "Ernst Vikne",
+        "license": "CC BY-SA 2.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+        "page": "https://commons.wikimedia.org/wiki/File:Diamond_ring_by_Ernst_Vikne.jpg",
+        "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Diamond_ring_by_Ernst_Vikne.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+      }
+    },
+    {
+      "key": "emeraldRingGold",
+      "src": "/media/stock/emeraldRingGold.jpg",
+      "width": 1600,
+      "height": 1256,
+      "category": "gemstones",
+      "alt": {
+        "en": "Gold ring set with an emerald and diamonds",
+        "hi": "पन्ना और हीरे जड़ी सोने की अंगूठी"
+      },
+      "credit": {
+        "provider": "Wikimedia Commons",
+        "title": "File:Emerald and diamond ring.jpg",
+        "creator": "gemteck1 from Seattle, Washington, USA",
+        "license": "CC BY 2.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+        "page": "https://commons.wikimedia.org/wiki/File:Emerald_and_diamond_ring.jpg",
+        "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/5/54/Emerald_and_diamond_ring.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+      }
+    },
+    {
+      "key": "goldBiscuit",
+      "src": "/media/stock/goldBiscuit.jpg",
+      "width": 1600,
+      "height": 1066,
+      "category": "coins",
+      "alt": {
+        "en": "Fine gold bullion bars",
+        "hi": "शुद्ध सोने की बिस्किट"
+      },
+      "credit": {
+        "provider": "Wikimedia Commons",
+        "title": "File:Gold bullion 1.jpg",
+        "creator": "Szaaman",
+        "license": "Public domain",
+        "licenseUrl": null,
+        "page": "https://commons.wikimedia.org/wiki/File:Gold_bullion_1.jpg",
+        "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/5/52/Gold_bullion_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+      }
+    },
+    {
+      "key": "bridalJewelleryIndia",
+      "src": "/media/stock/bridalJewelleryIndia.jpg",
+      "width": 1600,
+      "height": 1200,
+      "category": "bridal",
+      "alt": {
+        "en": "Bride wearing traditional Indian gold jewellery",
+        "hi": "पारंपरिक भारतीय सोने के गहनों में दुल्हन"
+      },
+      "credit": {
+        "provider": "Wikimedia Commons",
+        "title": "File:Bride by prakhar.jpg",
+        "creator": "Prakhar Amba from Grenoble, France",
+        "license": "CC BY 2.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+        "page": "https://commons.wikimedia.org/wiki/File:Bride_by_prakhar.jpg",
+        "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f0/Bride_by_prakhar.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+      }
+    },
+    {
+      "key": "goldNecklaceIndia",
+      "src": "/media/stock/goldNecklaceIndia.jpg",
+      "width": 1600,
+      "height": 2399,
+      "category": "necklaces",
+      "alt": {
+        "en": "Traditional Indian ceremonial gold necklace",
+        "hi": "पारंपरिक भारतीय सोने का औपचारिक हार"
+      },
+      "credit": {
+        "provider": "Wikimedia Commons",
+        "title": "File:Ceremonial welcome necklace given to First Lady Jacqueline Kennedy by Prime Minister Nehru during her state visit to India in 1962 (6).jpg",
+        "creator": "White House",
+        "license": "Public domain",
+        "licenseUrl": null,
+        "page": "https://commons.wikimedia.org/wiki/File:Ceremonial_welcome_necklace_given_to_First_Lady_Jacqueline_Kennedy_by_Prime_Minister_Nehru_during_her_state_visit_to_India_in_1962_(6).jpg",
+        "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f3/Ceremonial_welcome_necklace_given_to_First_Lady_Jacqueline_Kennedy_by_Prime_Minister_Nehru_during_her_state_visit_to_India_in_1962_%286%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+      }
     }
   ]
 }
