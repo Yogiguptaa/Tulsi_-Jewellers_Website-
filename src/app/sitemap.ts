@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { COLLECTIONS, FOOTER_POLICY_LINKS, ROUTES } from "@/lib/config";
 import { JEWEL_TYPES } from "@/lib/catalogue/jewel-types";
 import { GUIDES } from "@/lib/content/guides";
+import { DESIGNS } from "@/lib/designs";
 import { getCatalogue } from "@/lib/catalogue/source";
 import { absoluteUrl } from "@/lib/seo";
 
@@ -16,6 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: absoluteUrl(ROUTES.home), changeFrequency: "weekly", priority: 1 },
     { url: absoluteUrl(ROUTES.collections), changeFrequency: "weekly", priority: 0.9 },
+    { url: absoluteUrl(ROUTES.designs), changeFrequency: "monthly", priority: 0.85 },
     { url: absoluteUrl(ROUTES.rates), changeFrequency: "daily", priority: 0.9 },
     { url: absoluteUrl("/rates/history"), changeFrequency: "weekly", priority: 0.6 },
     { url: absoluteUrl("/rates/calculator"), changeFrequency: "weekly", priority: 0.7 },
@@ -52,6 +54,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
 
+  const designRoutes: MetadataRoute.Sitemap = DESIGNS.map((design) => ({
+    url: absoluteUrl(`/designs/${design.slug}`),
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
   const policyRoutes: MetadataRoute.Sitemap = FOOTER_POLICY_LINKS.map((link) => ({
     url: absoluteUrl(link.href),
     changeFrequency: "yearly",
@@ -64,6 +72,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...typeRoutes,
     ...productRoutes,
     ...guideRoutes,
+    ...designRoutes,
     ...policyRoutes,
   ];
 }

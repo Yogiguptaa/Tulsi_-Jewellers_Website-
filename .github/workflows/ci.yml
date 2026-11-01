@@ -1,0 +1,56 @@
+# Every push and pull request: the checks that have to pass before a deploy.
+#
+#   npm ci           reproducible install from package-lock.json
+#   npm test         placeholder guard + customer-copy / phone / licence guard
+#   npm run lint     eslint, zero warnings
+#   check:types      tsc --noEmit
+#   npm run build    the production build Vercel will run
+#
+# TEST SCOPE, STATED HONESTLY: the repository has no browser test runner (no
+# Playwright, no axe, no Lighthouse), so this pipeline does not claim to run
+# them. What it does run is deterministic and offline. The live smoke test in
+# smoke.yml covers the deployed pages over HTTP. Anything that needs a real
+# phone, a signed-in admin or a paid plan is listed in QA_REPORT.md.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch: {}
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Content and media guards
+        run: npm test
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run check:types
+
+      - name: Build
+        run: npm run build
+        env:
+          # A build must never depend on secrets. These are dummy, non-network
+          # values; the rate job skips cleanly when nothing is configured.
+          NEXT_TELEMETRY_DISABLED: "1"

@@ -665,3 +665,39 @@ Bulk photo upload with client-side compression, and product video, are not
 implemented: they need a live Supabase Storage bucket to be written and tested
 against, and writing an untestable upload path would be worse than the gap.
 `docs/PHOTO_GUIDE.md` documents the manual path until that exists.
+
+---
+
+## 0z. Final polish round — 1 Nov 2026 (live-site issues)
+
+Cause of the stuck rates board, measured against the deployment (details and the
+full table in `QA_REPORT.md`): the production `CRON_SECRET` was never set, so
+`/api/cron/fetch-rates` answered **503 in 1.4 s** — exactly the "fails after three
+seconds" — and, separately, no Supabase keys meant nothing was stored, so the read
+path had nothing to show.
+
+- [x] `.github/workflows/fetch-rates.yml` rewritten: status + secret-free body captured,
+      a named cause per status (000/401/403/404/429/503/5xx), two daily runs,
+      `workflow_dispatch`, idempotent second run.
+- [x] `lib/rates/service.ts`: live-feed fallback when no store is configured, so the
+      deployed board shows today's INR rate with its IST timestamp and the
+      "converted to INR" note instead of an empty board. Writes nothing; 15-minute
+      instance cache, 60 s after a failure. Supabase + `CRON_SECRET` still switch the
+      site to stored rows, history, admin override and the quota counter.
+- [x] `formatDateTime` prints the zone (`… pm IST`); `timeZoneName` cannot be combined
+      with `timeStyle`, which is why the zone had silently disappeared.
+- [x] Home: empty "New designs arriving" section removed; the Popular Designs strip
+      takes its place. One address from config (no "Hansapuri (Itwari)" beside it).
+- [x] Meta description "today's benchmark rate" → "today's gold and silver rate";
+      caption and "Enquire on WhatsApp" labels rewritten EN + HI.
+- [x] Cinematic intro removed entirely (component, footer replay button, strings): the
+      film it advertised does not exist. Route skeleton prints no loading word.
+- [x] `/designs` + `/designs/[style]` with typed `lib/designs.ts` (11 styles, EN/HI),
+      manifest-only photographs, honest "no photo yet" panel, real 404 on unknown slug,
+      sitemap + footer entries.
+- [x] New guards: `scripts/check-customer-copy.mjs` (demo/GST/benchmark/env/₹0/NaN,
+      published numbers only, design→manifest→licence→alt, design→guide) and
+      `scripts/smoke-live.mjs` (`npm run test:live` / `test:local`).
+- [x] `.github/workflows/ci.yml`: `npm test`, lint, types, build on every push/PR.
+- Remaining owner action: `CRON_SECRET` in Vercel **and** GitHub, then Supabase for
+      stored history. Soft 404s on older dynamic routes are unchanged (see above).

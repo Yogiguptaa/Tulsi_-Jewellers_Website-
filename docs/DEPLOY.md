@@ -200,7 +200,17 @@ GitHub → **Settings → Secrets and variables → Actions** → add:
 - `CRON_SECRET` — exactly the same value as in Vercel
 
 `.github/workflows/fetch-rates.yml` then calls the route daily. The route answers
-**503 without `CRON_SECRET`**, so it is never an open write path.
+**503 without `CRON_SECRET`**, so it is never an open write path. If the workflow
+ever fails in a few seconds, that 503 is the reason: the secret was never added
+here or in Vercel. The workflow now prints the status and the route's own message
+so the fix is named in the log.
+
+**Before Supabase exists:** the board does not go blank. With no database and no
+local store, `/rates` reads the configured automatic feed at request time and
+renders the same snapshot (same validation, same "converted to INR" note,
+15-minute server cache, 60-second retry after a failure). It writes nothing, so
+history, admin override and the monthly quota counter need Supabase as described
+above; the customer-facing board works either way.
 
 ---
 

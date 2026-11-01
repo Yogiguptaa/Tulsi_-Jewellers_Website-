@@ -79,8 +79,13 @@ when `RATE_PROVIDER` is unset, and it runs every day.
    in Vercel **and** in GitHub → Settings → Secrets and variables → Actions, plus
    `SITE_URL` in GitHub. Without the secret the cron route answers 503 by design.
 4. ⬜ Run the Stage 12 and Stage 13 migrations and add
-   `SUPABASE_SERVICE_ROLE_KEY` to Vercel, otherwise the live site keeps no rate
-   (on a laptop it falls back to `.data/rates.json`).
+   `SUPABASE_SERVICE_ROLE_KEY` to Vercel, otherwise the live site keeps no stored
+   rate (on a laptop it falls back to `.data/rates.json`).
+   **Until then the board still shows a real value:** with no database configured,
+   `/rates` and the home ticker read the automatic feed at request time (15-minute
+   server cache) instead of showing an empty board. Adding Supabase switches it to
+   stored, auditable rows with history and the admin override — nothing in the UI
+   changes.
 5. ⬜ **Rates appear without any cron, too.** Open `/rates` — when the stored value
    is missing or older than six hours the API refreshes it once by itself (one lock,
    quota-guarded). Nothing to press.
