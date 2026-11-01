@@ -101,6 +101,76 @@ function toObservation(row: MetalRateRow): RateObservation {
   };
 }
 
+/* -------------------------------------------------------------------------- */
+/* Live fallback — no database configured                                     */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * WHY THIS EXISTS
+ * ───────────────
+ * The production store is Supabase. A deployment that has not been given the
+ * Supabase keys yet (or whose Vercel `CRON_SECRET` was never set) would then show
+ * "today's rate is being updated" on every visit, forever, however healthy the
+ * schedule is: nothing is stored, so there is nothing to read.
+ *
+ * Rather than leave the board blank, this reads the configured automatic feed at
+ * request time and renders exactly the same snapshot the stored path produces.
+ * It writes nothing — no database, no file, no quota counter — and it is not a
+ * substitute for the cron: it is the "no store" state behaving honestly instead
+ * of looking broken. The value, its source, its timestamp and the
+ * "international market price converted to INR" note all come from the feed.
+ *
+ * Cost: one provider call per warm server instance per 15 minutes at most, on top
+ * of the page cache. When the requested provider is manual, or the call fails, it
+ * returns null and the caller keeps the honest "being updated" message.
+ */
+const LIVE_FALLBACK_TTL_MS = 15 * 60_000;
+/** A failure is retried sooner than a success, so one bad minute is not 15. */
+const LIVE_FALLBACK_ERROR_TTL_MS = 60_000;
+
+const liveCache = globalThis as typeof globalThis & {
+  __tulsiLiveRates?: { at: number; ttl: number; snapshot: RatesSnapshot | null };
+};
+
+async function liveFeedSnapshot(): Promise<RatesSnapshot | null> {
+  const cached = liveCache.__tulsiLiveRates;
+  if (cached && Date.now() - cached.at < cached.ttl) return cached.snapshot;
+
+  const provider = resolveProvider().active;
+  let snapshot: RatesSnapshot | null = null;
+
+  if (provider.kind === "external" && provider.isConfigured()) {
+    try {
+      const result = await provider.fetchLatest();
+      const rows: MetalRateRow[] = result.rates.map((rate, index) => ({
+        id: `${provider.recordAs ?? provider.kind}-live-${index}`,
+        metal: rate.metal,
+        purity: rate.purity,
+        unit: rate.unit,
+        rate: rate.rate,
+        source: provider.sourceName,
+        provider: provider.recordAs ?? provider.kind,
+        rate_type: rate.rateType,
+        observed_at: result.observedAt,
+        fetched_at: new Date().toISOString(),
+        market_session: "unknown",
+        gst_included: rate.gstIncluded,
+        making_charges_included: rate.makingChargesIncluded,
+      }));
+      if (rows.length > 0) snapshot = assembleSnapshot(rows);
+    } catch {
+      snapshot = null;
+    }
+  }
+
+  liveCache.__tulsiLiveRates = {
+    at: Date.now(),
+    ttl: snapshot ? LIVE_FALLBACK_TTL_MS : LIVE_FALLBACK_ERROR_TTL_MS,
+    snapshot,
+  };
+  return snapshot;
+}
+
 function emptySnapshot(notice: string | null): RatesSnapshot {
   return {
     status: "unavailable",
@@ -139,6 +209,10 @@ export async function readRatesSnapshotNow(): Promise<RatesSnapshot> {
       const rows = await readLocalRows();
       if (rows.length > 0) return assembleSnapshot(rows as unknown as MetalRateRow[]);
     }
+    // No store at all (the live deployment before its keys are added): read the
+    // configured automatic feed directly, and cache the result in-process.
+    const live = await liveFeedSnapshot();
+    if (live) return live;
     return emptySnapshot(
       "Today's rate is being updated. Please call or WhatsApp us for the current rate.",
     );

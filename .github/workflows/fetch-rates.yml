@@ -1,17 +1,27 @@
-# Automatic daily rates — safety net alongside Vercel Cron.
+# Automatic daily rates — the safety net alongside Vercel Cron.
 #
 # Two triggers, one job:
 #   04:00 UTC = 09:30 IST   the normal daily run
-#   05:00 UTC = 10:30 IST   a retry in case the first run failed, which does
-#                           nothing (and spends no API call) when today's rates
-#                           are already stored — the endpoint is idempotent.
+#   05:00 UTC = 10:30 IST   a retry in case the first run failed. The endpoint is
+#                           idempotent, so when today's rates are already stored
+#                           it returns 200 with skipped=true and spends no call.
 #
-# Required repository secrets (Settings → Secrets and variables → Actions):
-#   SITE_URL      e.g. https://tulsijewellersnagpur.com  (no trailing slash)
-#   CRON_SECRET   the same value set in Vercel; a long random string
+# Required secret (Settings → Secrets and variables → Actions):
+#   CRON_SECRET   exactly the same value as CRON_SECRET in Vercel (Production and
+#                 Preview). Changing it in Vercel needs a redeploy before it takes
+#                 effect.
 #
-# The API key itself never appears here: it lives only in Vercel's environment
-# variables, and the endpoint refuses to run without CRON_SECRET.
+# Optional repository secret or variable:
+#   SITE_URL      defaults to the production domain below, with no trailing slash.
+#
+# The API key never appears here: it lives only in Vercel's environment variables,
+# and the endpoint refuses to run without CRON_SECRET.
+#
+# WHY THIS FILE REPORTS EVERY STATUS
+# The old version used `curl -f`, so a 401, a 404, a Vercel protection page and a
+# real server error all looked the same: "failed after three seconds". Now the
+# status and the (secret-free) response body are printed, and the step fails with
+# a message that names the fix.
 
 name: Fetch gold and silver rates
 
@@ -25,21 +35,72 @@ concurrency:
   group: fetch-rates
   cancel-in-progress: false
 
+env:
+  SITE_URL: ${{ secrets.SITE_URL || 'https://tulsijewellerswebsite.vercel.app' }}
+
 jobs:
   fetch:
     runs-on: ubuntu-latest
+    timeout-minutes: 6
     steps:
-      - name: Check configuration
+      - name: Check the deployment secret
         run: |
-          if [ -z "${{ secrets.SITE_URL }}" ] || [ -z "${{ secrets.CRON_SECRET }}" ]; then
-            echo "::error::Set the SITE_URL and CRON_SECRET repository secrets before relying on this schedule."
+          if [ -z "${{ secrets.CRON_SECRET }}" ]; then
+            echo "::error title=CRON_SECRET is missing::Add CRON_SECRET under Settings → Secrets and variables → Actions. It must be exactly the same value as the CRON_SECRET environment variable in Vercel (Production and Preview). Without it the endpoint refuses to run."
             exit 1
           fi
+          echo "Calling ${SITE_URL%/}/api/cron/fetch-rates"
 
       - name: Trigger the rate job
         run: |
-          # -sS keeps curl quiet but shows real errors; -f fails the step on 4xx/5xx.
-          # The response body carries only status, counts and reasons — never a key.
-          curl -sS -f -X POST \
+          set -uo pipefail
+          url="${SITE_URL%/}/api/cron/fetch-rates"
+          body="$(mktemp)"
+          # No --fail: the body and the exact status are what make a failure
+          # diagnosable. --retry covers a cold start or a dropped connection.
+          status="$(curl --silent --show-error --location \
+            --retry 3 --retry-delay 10 --retry-connrefused --max-time 60 \
+            -o "$body" -w "%{http_code}" \
+            -X POST \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            "${{ secrets.SITE_URL }}/api/cron/fetch-rates"
+            -H "Accept: application/json" \
+            "$url")" || status="000"
+
+          echo "HTTP $status"
+          echo "Response:"
+          cat "$body" || true
+          echo
+
+          case "$status" in
+            000)
+              echo "::error title=Could not reach the site::SITE_URL is '$SITE_URL'. Set it to the production domain with no trailing slash, and check that the deployment is running."
+              exit 1
+              ;;
+            200|202)
+              echo "Rate job accepted. A skipped response means today's rows already exist."
+              ;;
+            401|403)
+              echo "::error title=The site rejected CRON_SECRET::The GitHub secret and the Vercel variable are different, or Vercel Deployment Protection is blocking /api/cron/*. Copy the value from Vercel (Production) into the GitHub secret, redeploy, and allow the cron path through protection."
+              exit 1
+              ;;
+            404)
+              echo "::error title=Wrong path::/api/cron/fetch-rates returned 404. Check that the latest production deployment includes src/app/api/cron/fetch-rates/route.ts and that SITE_URL points at the project's production domain, not a preview."
+              exit 1
+              ;;
+            429)
+              echo "::error title=Quota reached::The rate provider's monthly allowance is used up. The last verified rate stays published; raise RATE_API_MONTHLY_LIMIT or wait for the reset."
+              exit 1
+              ;;
+            503)
+              echo "::error title=The endpoint is not configured::CRON_SECRET is missing or empty in the Vercel environment. Add it to Production and Preview, confirm RATE_PROVIDER (or the Supabase keys) are set, then redeploy — environment changes only apply to new deployments."
+              exit 1
+              ;;
+            5*)
+              echo "::error title=Server error::The job failed inside the deployment. The JSON body above names the stage; check the Vercel function logs for the same timestamp."
+              exit 1
+              ;;
+            *)
+              echo "::error title=Unexpected HTTP $status::The response body above is the site's own message."
+              exit 1
+              ;;
+          esac

@@ -69,15 +69,26 @@ export function ageLabel(iso: string | null, now: number, lang: "en" | "hi" = "e
   return pick(`${value} day${value === 1 ? "" : "s"} ago`, `${value} दिन पहले`);
 }
 
-/** Full date + time for the "as on" line. */
+/**
+ * Full date + time for the "as on" line: "1 Nov 2026, 12:13 pm IST".
+ *
+ * The zone is named rather than assumed: every stored time is an instant, and a
+ * reader in another country must be able to tell that the shop means India time.
+ * Fields are listed explicitly because `timeZoneName` cannot be combined with
+ * `timeStyle`, and the earlier version therefore printed the time with no zone.
+ */
 export function formatDateTime(iso: string | null, lang: "en" | "hi" = "en"): string | null {
   if (!iso) return null;
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return null;
   return new Intl.DateTimeFormat(lang === "hi" ? "hi-IN" : "en-IN", {
-    dateStyle: "medium",
-    timeStyle: "short",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
     timeZone: "Asia/Kolkata",
+    timeZoneName: "short",
   }).format(date);
 }
 
