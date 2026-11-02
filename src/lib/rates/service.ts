@@ -11,6 +11,7 @@ import { RATE_ROWS } from "@/lib/config";
 import { publicSupabase } from "@/lib/supabase/public";
 import { localStoreAvailable, readLocalRows } from "./localStore";
 import { resolveProvider } from "./providers";
+import { marketFallbackProvider } from "./providers/marketFallback";
 import { SPOT_CONVERTED_NOTE } from "./providers/metalsDev";
 import { formatDateTime } from "./format";
 import type { MarketSession, RateLine, RateObservation, RateSource, RateStatusKind, RatesSnapshot } from "./types";
@@ -127,39 +128,85 @@ function toObservation(row: MetalRateRow): RateObservation {
 const LIVE_FALLBACK_TTL_MS = 15 * 60_000;
 /** A failure is retried sooner than a success, so one bad minute is not 15. */
 const LIVE_FALLBACK_ERROR_TTL_MS = 60_000;
+/**
+ * How long an already-fetched value may keep being shown when every feed fails.
+ * A shop's board going blank because a third-party endpoint had a bad night is
+ * worse than showing the rate it verified an hour ago with its own timestamp and
+ * "please confirm today's rate at the store" — which is exactly what this does.
+ */
+const LAST_GOOD_MAX_AGE_MS = 24 * 3_600_000;
 
 const liveCache = globalThis as typeof globalThis & {
   __tulsiLiveRates?: { at: number; ttl: number; snapshot: RatesSnapshot | null };
+  __tulsiLastGoodRates?: { at: number; snapshot: RatesSnapshot };
 };
+
+/** One provider call, turned into the same row shape the database stores. */
+async function rowsFromProvider(provider: ReturnType<typeof resolveProvider>["active"]): Promise<MetalRateRow[] | null> {
+  try {
+    const result = await provider.fetchLatest();
+    const rows: MetalRateRow[] = result.rates.map((rate, index) => ({
+      id: `${provider.recordAs ?? provider.kind}-live-${index}`,
+      metal: rate.metal,
+      purity: rate.purity,
+      unit: rate.unit,
+      rate: rate.rate,
+      source: provider.sourceName,
+      provider: provider.recordAs ?? provider.kind,
+      rate_type: rate.rateType,
+      observed_at: result.observedAt,
+      fetched_at: new Date().toISOString(),
+      market_session: "unknown",
+      gst_included: rate.gstIncluded,
+      making_charges_included: rate.makingChargesIncluded,
+    }));
+    return rows.length > 0 ? rows : null;
+  } catch {
+    return null;
+  }
+}
 
 async function liveFeedSnapshot(): Promise<RatesSnapshot | null> {
   const cached = liveCache.__tulsiLiveRates;
   if (cached && Date.now() - cached.at < cached.ttl) return cached.snapshot;
 
-  const provider = resolveProvider().active;
-  let snapshot: RatesSnapshot | null = null;
+  // Primary first, then the independent fallback. A provider chosen as "manual"
+  // is respected: the shop asked for no automatic value, so nothing is fetched.
+  const resolution = resolveProvider();
+  const candidates: Array<ReturnType<typeof resolveProvider>["active"]> = [];
+  if (resolution.active.kind === "external" && resolution.active.isConfigured()) {
+    candidates.push(resolution.active);
+  }
+  if (resolution.requested !== "manual") candidates.push(marketFallbackProvider);
 
-  if (provider.kind === "external" && provider.isConfigured()) {
-    try {
-      const result = await provider.fetchLatest();
-      const rows: MetalRateRow[] = result.rates.map((rate, index) => ({
-        id: `${provider.recordAs ?? provider.kind}-live-${index}`,
-        metal: rate.metal,
-        purity: rate.purity,
-        unit: rate.unit,
-        rate: rate.rate,
-        source: provider.sourceName,
-        provider: provider.recordAs ?? provider.kind,
-        rate_type: rate.rateType,
-        observed_at: result.observedAt,
-        fetched_at: new Date().toISOString(),
-        market_session: "unknown",
-        gst_included: rate.gstIncluded,
-        making_charges_included: rate.makingChargesIncluded,
-      }));
-      if (rows.length > 0) snapshot = assembleSnapshot(rows);
-    } catch {
-      snapshot = null;
+  let snapshot: RatesSnapshot | null = null;
+  let usedFallback = false;
+  for (const provider of candidates) {
+    const rows = await rowsFromProvider(provider);
+    if (!rows) continue;
+    snapshot = assembleSnapshot(rows);
+    usedFallback = provider === marketFallbackProvider;
+    break;
+  }
+
+  if (snapshot && usedFallback) {
+    // Say which publisher this is: the fallback is COMEX futures, not the spot
+    // feed, and the customer note must not imply otherwise.
+    snapshot = { ...snapshot, customerNote: marketFallbackProvider.customerNote ?? snapshot.customerNote };
+  }
+
+  if (snapshot) {
+    liveCache.__tulsiLastGoodRates = { snapshot, at: Date.now() };
+  } else {
+    const lastGood = liveCache.__tulsiLastGoodRates;
+    if (lastGood && Date.now() - lastGood.at < LAST_GOOD_MAX_AGE_MS) {
+      const when = lastGood.snapshot.asOf ? formatDateTime(lastGood.snapshot.asOf, "en") : null;
+      snapshot = {
+        ...lastGood.snapshot,
+        status: "stale",
+        generatedAt: new Date().toISOString(),
+        notice: `Showing the last rate we could verify${when ? ` at ${when}` : ""}. Please confirm today's rate at the store.`,
+      };
     }
   }
 

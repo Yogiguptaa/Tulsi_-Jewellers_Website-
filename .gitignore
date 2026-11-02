@@ -74,3 +74,6 @@ next-env.d.ts
 /screenshots/
 # Local pointer to the Freebuff Sites project, not part of the app.
 /.freebuff/
+
+# Local-only: the generated CRON_SECRET for Vercel + GitHub.
+.cron-secret.txt

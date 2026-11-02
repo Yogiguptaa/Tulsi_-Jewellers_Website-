@@ -19,6 +19,7 @@ import BangleShowcase from "@/components/content/BangleShowcase";
 const COLLECTION_IMAGE: Record<string, string> = {
   "gold-jewellery": "kadaMeenakari",
   "gold-coins": "goldCoins",
+  "gold-biscuits": "goldBiscuit",
   "silver-jewellery": "silverDisplay",
   "fancy-jewellery": "bangleRubyDiamond",
   gems: "rubyRing",

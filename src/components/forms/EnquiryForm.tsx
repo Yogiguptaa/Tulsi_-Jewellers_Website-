@@ -51,6 +51,7 @@ export default function EnquiryForm({
   });
   const [errors, setErrors] = useState<EnquiryErrors>({});
   const [state, setState] = useState<"idle" | "sending" | "sent" | "failed">("idle");
+  const { lang } = useLanguage();
   const [serverMessage, setServerMessage] = useState<string | null>(null);
 
   const update = (field: keyof typeof values, value: string | boolean) =>
@@ -127,6 +128,20 @@ export default function EnquiryForm({
   }
 
   const phone = CONTACT.phones[0];
+  // If the site cannot save the enquiry (no database configured yet, or a
+  // storage failure), the visitor is never left at a dead end: the same words
+  // open in WhatsApp, already written out, so the enquiry still reaches us.
+  const handoff = whatsappHref(
+    [
+      values.name ? `Name: ${values.name}` : null,
+      values.phone ? `Phone: ${values.phone}` : null,
+      values.email ? `Email: ${values.email}` : null,
+      values.monthlyAmount ? `Monthly amount: ₹${values.monthlyAmount}` : null,
+      values.message ? values.message : null,
+    ]
+      .filter(Boolean)
+      .join("\n") || "Hello Tulsi Jewellers, I would like to make an enquiry.",
+  );
 
   return (
     <form onSubmit={submit} noValidate className="space-y-4 border border-gold/25 bg-offwhite p-5 sm:p-6">
@@ -225,7 +240,22 @@ export default function EnquiryForm({
         {t("enquiry.consent")}
       </label>
 
-      {state === "failed" && serverMessage ? <Notice tone="warning">{serverMessage}</Notice> : null}
+      {state === "failed" && serverMessage ? (
+        <div className="space-y-3">
+          <Notice tone="warning">{serverMessage}</Notice>
+          {handoff ? (
+            <a
+              href={handoff}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm font-medium text-emerald-600 underline underline-offset-4"
+            >
+              <MessageCircle className="h-4 w-4" aria-hidden="true" />
+              {lang === "hi" ? "यही बात व्हाट्सऐप पर भेजें" : "Send the same details on WhatsApp"}
+            </a>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="flex flex-wrap items-center gap-3">
         <button
