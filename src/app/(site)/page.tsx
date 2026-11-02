@@ -13,6 +13,8 @@ import {
 } from "@/lib/seo";
 import HomeView from "@/components/views/HomeView";
 import JsonLd from "@/components/seo/JsonLd";
+import FestivalStrip from "@/components/festivals/FestivalStrip";
+import { getFestivalStripData } from "@/lib/festivals/service";
 import { imageSrc } from "@/lib/catalogue/images";
 
 export const metadata: Metadata = buildMetadata({
@@ -35,10 +37,11 @@ export const metadata: Metadata = buildMetadata({
 export default async function HomePage() {
   // Both reads are cached (`use cache`) and invalidated by the admin actions, so
   // an approved review or a new product appears on the next request.
-  const [{ products, source }, reviews, rates] = await Promise.all([
+  const [{ products, source }, reviews, rates, festival] = await Promise.all([
     getCatalogue(),
     getPublicReviews(),
     getRatesSnapshot(),
+    getFestivalStripData(),
   ]);
 
   // Home-page FAQ preview mirrors the five questions rendered in HomeView.
@@ -51,6 +54,7 @@ export default async function HomePage() {
       <JsonLd
         data={jsonLdGraph([jewelryStoreJsonLd("en"), collectionsJsonLd("en"), faqJsonLd(faqPreview)])}
       />
+      <FestivalStrip data={festival} />
       <HomeView
         products={products}
         source={source}

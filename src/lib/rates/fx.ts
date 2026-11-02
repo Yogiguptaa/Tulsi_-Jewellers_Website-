@@ -1,3 +1,5 @@
+import { safeFetchJson } from "@/lib/safeFetch";
+
 /**
  * rates/fx.ts — SERVER-ONLY helpers shared by the automatic feeds.
  *
@@ -16,49 +18,27 @@ export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-/** Retries network errors and HTTP 5xx three times; everything else is final. */
+/**
+ * One real HTTP call for a rate feed.
+ *
+ * The retry, timeout and "never throw from the transport" rules live in
+ * `lib/safeFetch.ts`; this wrapper only translates its typed failure into the
+ * sentences the admin panel shows. A 4xx stays final (a wrong key must surface,
+ * not loop), a 5xx or a dropped connection gets three attempts, and a call that
+ * hangs is cut off instead of holding the request open.
+ */
 export async function fetchJsonWithRetry(
   url: string,
   headers: Record<string, string>,
 ): Promise<unknown> {
-  const attempts = 3;
-  let lastError: Error = new Error("The rate provider could not be reached.");
+  const result = await safeFetchJson(url, { headers, attempts: 3, label: "rates:feed" });
+  if (result.ok) return result.data;
 
-  for (let attempt = 1; attempt <= attempts; attempt += 1) {
-    let response: Response;
-    try {
-      response = await fetch(url, {
-        headers: { Accept: "application/json", ...headers },
-        cache: "no-store",
-        // A redirect would carry the bearer token to another host.
-        redirect: "error",
-      });
-    } catch {
-      lastError = new Error("The rate provider could not be reached (network error).");
-      if (attempt < attempts) {
-        await sleep(500 * attempt * attempt);
-        continue;
-      }
-      throw lastError;
-    }
-
-    if (response.status >= 500) {
-      lastError = new Error(`The rate provider responded with HTTP ${response.status}.`);
-      if (attempt < attempts) {
-        await sleep(500 * attempt * attempt);
-        continue;
-      }
-      throw lastError;
-    }
-    if (!response.ok) throw new Error(`The rate provider responded with HTTP ${response.status}.`);
-
-    try {
-      return (await response.json()) as unknown;
-    } catch {
-      throw new Error("The rate provider returned a response that was not valid JSON.");
-    }
-  }
-  throw lastError;
+  const { kind, message, status } = result.error;
+  if (kind === "http") throw new Error(`The rate provider responded with HTTP ${status ?? message}.`);
+  if (kind === "json") throw new Error("The rate provider returned a response that was not valid JSON.");
+  if (kind === "timeout") throw new Error("The rate provider did not answer in time.");
+  throw new Error("The rate provider could not be reached (network error).");
 }
 
 function asRecord(value: unknown, message: string): Record<string, unknown> {

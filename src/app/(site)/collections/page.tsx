@@ -3,6 +3,8 @@ import { getCatalogue } from "@/lib/catalogue/source";
 import { buildMetadata, breadcrumbJsonLd, collectionsJsonLd, jsonLdGraph } from "@/lib/seo";
 import { CollectionsView } from "@/components/views/catalogue-views";
 import JsonLd from "@/components/seo/JsonLd";
+import FestivalStrip from "@/components/festivals/FestivalStrip";
+import { getFestivalStripData } from "@/lib/festivals/service";
 import { imageSrc } from "@/lib/catalogue/images";
 
 export const metadata: Metadata = buildMetadata({
@@ -21,7 +23,7 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default async function CollectionsPage() {
-  const { products } = await getCatalogue();
+  const [{ products }, festival] = await Promise.all([getCatalogue(), getFestivalStripData()]);
 
   return (
     <>
@@ -34,6 +36,7 @@ export default async function CollectionsPage() {
           ]),
         ])}
       />
+      <FestivalStrip data={festival} />
       <CollectionsView products={products} />
     </>
   );

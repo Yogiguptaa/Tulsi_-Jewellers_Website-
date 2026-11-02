@@ -8,13 +8,14 @@
   "scripts": {
     "dev": "next dev",
     "build": "node ./node_modules/next/dist/bin/next build",
-    "verify": "node scripts/check-placeholders.mjs && node scripts/check-customer-copy.mjs && node ./node_modules/typescript/lib/tsc.js --noEmit && node ./node_modules/eslint/bin/eslint.js src --max-warnings=0",
+    "verify": "node scripts/check-placeholders.mjs && node scripts/check-customer-copy.mjs && node ./node_modules/vitest/vitest.mjs run && node ./node_modules/typescript/lib/tsc.js --noEmit && node ./node_modules/eslint/bin/eslint.js src --max-warnings=0",
     "start": "next start",
     "lint": "node ./node_modules/eslint/bin/eslint.js src --max-warnings=0",
     "check:types": "node ./node_modules/typescript/lib/tsc.js --noEmit",
     "check:placeholders": "node scripts/check-placeholders.mjs",
     "check:copy": "node scripts/check-customer-copy.mjs",
-    "test": "node scripts/check-placeholders.mjs && node scripts/check-customer-copy.mjs",
+    "test": "node scripts/check-placeholders.mjs && node scripts/check-customer-copy.mjs && node ./node_modules/vitest/vitest.mjs run",
+    "test:unit": "node ./node_modules/vitest/vitest.mjs run",
     "test:live": "node scripts/smoke-live.mjs",
     "test:local": "node scripts/smoke-live.mjs http://localhost:3000",
     "check:rates": "node scripts/check-rate-provider.mjs",
@@ -44,6 +45,7 @@
     "qrcode": "^1.5.4",
     "tailwindcss": "^4",
     "typescript": "^5",
+    "vitest": "^3.2.7",
     "wrangler": "4.148.0"
   }
 }

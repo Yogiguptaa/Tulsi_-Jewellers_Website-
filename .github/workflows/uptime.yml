@@ -1,0 +1,87 @@
+# Every 30 minutes: is the live site still answering, and does it still have
+# today's rates? Opens (or reuses) a GitHub issue when it does not, so the
+# failure is visible without anyone watching a dashboard.
+#
+# The health endpoint is public-safe: it returns states, never keys or URLs.
+# No secret is required; SITE_URL is optional and falls back to the deployment.
+
+name: Uptime
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: uptime
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Health and home page
+        id: probe
+        env:
+          SITE_URL: ${{ secrets.SITE_URL }}
+        run: |
+          set -u
+          base="${SITE_URL:-https://tulsijewellerswebsite.vercel.app}"
+          base="${base%/}"
+
+          health_body="$(mktemp)"
+          health_status="$(curl -sS --max-time 20 -o "$health_body" -w '%{http_code}' "$base/api/health" || echo 000)"
+          home_status="$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' "$base/" || echo 000)"
+
+          echo "health=$health_status home=$home_status"
+          cat "$health_body" || true
+          echo ""
+
+          problem=""
+          if [ "$health_status" = "000" ]; then
+            problem="the deployment did not answer (DNS, certificate or bad SITE_URL)"
+          elif [ "$health_status" = "503" ]; then
+            problem="the rate board has no published value at all (health reported down)"
+          elif [ "$health_status" != "200" ]; then
+            problem="the health endpoint answered HTTP $health_status"
+          elif [ "$home_status" != "200" ]; then
+            problem="the home page answered HTTP $home_status"
+          fi
+
+          {
+            echo "problem=$problem"
+            echo "base=$base"
+          } >> "$GITHUB_OUTPUT"
+
+          if [ -n "$problem" ]; then
+            exit 1
+          fi
+
+      - name: Open an issue when the site is unhealthy
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BASE_URL: ${{ steps.probe.outputs.base }}
+          PROBLEM: ${{ steps.probe.outputs.problem }}
+        run: |
+          title="Site health check failed"
+          existing="$(gh issue list --state open --search "$title in:title" --json number --jq '.[0].number // empty')"
+          body="The scheduled health check failed.
+
+          - Site: ${BASE_URL:-unknown}
+          - Cause: ${PROBLEM:-unknown}
+          - Checked: $(date -u '+%Y-%m-%d %H:%M UTC')
+
+          What to look at, in order: \`/api/health\` in a browser, Vercel → Deployments
+          for a failed build, then the 'Fetch gold and silver rates' workflow run."
+
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body"
+          fi

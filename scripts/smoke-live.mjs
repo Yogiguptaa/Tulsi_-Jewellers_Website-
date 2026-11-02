@@ -10,7 +10,8 @@
  *   • each main page has exactly one h1 and a non-empty <title>;
  *   • no customer-visible copy contains demo/placeholder/GST/env names/₹0/NaN;
  *   • every tel: and wa.me number is one of the two published lines;
- *   • /api/rates/latest answers 200 and reports its own state honestly.
+ *   • /api/rates/latest answers 200 and reports its own state honestly;
+ *   • /api/health answers and does not report the site as down.
  *
  * It exits non-zero on any failure, so CI and a post-deploy check can trust it.
  * It never checks anything that needs a login, a browser or a paid plan; those
@@ -189,6 +190,23 @@ async function main() {
     fail(`/api/rates/latest answered ${rates.status}`);
   }
   console.log(`Rates API: ${ratesNote}`);
+
+  // The health endpoint is what the uptime workflow reads. It must answer, must
+  // be JSON, and must not report "down" (no published rate at all).
+  const health = await get("/api/health");
+  let healthNote = `status ${health.status}`;
+  if (health.status === 200 || health.status === 503) {
+    try {
+      const payload = JSON.parse(health.body);
+      healthNote += `, reported "${payload.status}", next festival in ${payload.checks?.nextFestivalDays ?? "?"} days`;
+      if (payload.status === "down") fail("/api/health reports down: the rate board has no value at all");
+    } catch {
+      fail("/api/health did not return JSON");
+    }
+  } else {
+    fail(`/api/health answered ${health.status}`);
+  }
+  console.log(`Health endpoint: ${healthNote}`);
 
   console.log("");
   for (const note of notes) console.log(`ℹ ${note}`);

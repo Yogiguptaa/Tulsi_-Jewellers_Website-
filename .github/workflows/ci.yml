@@ -2,15 +2,18 @@
 #
 #   npm ci           reproducible install from package-lock.json
 #   npm test         placeholder guard + customer-copy / phone / licence guard
+#                    + the Vitest suite (festival dates, safeFetch, calculator)
 #   npm run lint     eslint, zero warnings
 #   check:types      tsc --noEmit
 #   npm run build    the production build Vercel will run
 #
 # TEST SCOPE, STATED HONESTLY: the repository has no browser test runner (no
 # Playwright, no axe, no Lighthouse), so this pipeline does not claim to run
-# them. What it does run is deterministic and offline. The live smoke test in
-# smoke.yml covers the deployed pages over HTTP. Anything that needs a real
-# phone, a signed-in admin or a paid plan is listed in QA_REPORT.md.
+# them. What it does run is deterministic and offline: the guards, the Vitest
+# suite and the production build. The deployed pages are covered separately by
+# scripts/smoke-live.mjs and the uptime workflow, both over plain HTTP. Anything
+# that needs a real phone, a signed-in admin or a paid plan is listed in
+# QA_REPORT.md.
 
 name: CI
 

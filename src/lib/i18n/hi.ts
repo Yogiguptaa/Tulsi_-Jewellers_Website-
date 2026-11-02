@@ -473,6 +473,13 @@ export const hi: Dictionary = {
   "share.whatsapp": "व्हाट्सएप पर साझा करें",
   "share.native": "साझा करें…",
 
+  /* Festival strip */
+  "festival.today": "आज",
+  "festival.tomorrow": "कल",
+  "festival.inDays": "{days} दिन बाकी",
+  "festival.greeting": "{name} की हार्दिक शुभकामनाएँ",
+  "festival.cta": "व्हाट्सऐप पर पूछें",
+
   /* Structured / misc */
   "seo.guideSuffix": "गाइड",
   "misc.pageNotFound": "पेज नहीं मिला",

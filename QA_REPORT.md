@@ -130,3 +130,25 @@ New files that make this repeatable: `scripts/check-customer-copy.mjs`,
    the quota counter. Run the SQL in the order listed in `docs/DEPLOY.md`.
 4. Real showroom photographs and the real logo; product uploads in the admin panel.
 5. Confirm the address, hours and both phone numbers match the signboard.
+
+---
+
+## 12. Festival engine and resilience layer (2 Nov 2026)
+
+Run from the repository, against a production build (`next build` + `next start`).
+
+| Check | Command | Result |
+| --- | --- | --- |
+| Unit suite (47 tests) | `npm run test:unit` | **pass** — festival data integrity, festival selection, safeFetch, calculator, formatting, env |
+| Placeholder guard | `npm run check:placeholders` | pass (4 documented placeholders, none visible) |
+| Copy / phone / licence guard | `npm run check:copy` | pass (5,677 strings, 11 styles, 22 media assets) |
+| Types | `npm run check:types` | pass |
+| ESLint | `npm run lint` | pass, zero warnings |
+| Production build | `npm run build` | pass |
+| `/api/health` | `curl localhost:3111/api/health` | `200`, `status: "ok"`, rates 6/6 filled, `nextFestivalDays: 4` |
+| Festival strip on `/` | `curl /` | renders "Dhanteras · Friday 6 November · 4 days to go" + copy + WhatsApp CTA |
+| Festival strip on `/collections` | `curl /collections` | renders the same band |
+
+Not run here, stated rather than implied: browser e2e, axe, Lighthouse, and any
+Supabase-backed surface (no project attached). The rate board and the festival
+strip were exercised over HTTP against the built site, not in a browser.

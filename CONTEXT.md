@@ -5,6 +5,60 @@ Read this file first, then the stage list at the bottom.
 
 ---
 
+## 0y. Festival engine + resilience layer (2 Nov 2026)
+
+Done in this round, verified locally against a production build:
+
+### Festival strip (PHASE 2 of the future-proof prompt)
+
+- [x] `src/lib/festivals/data.ts` — **2026 only**, 11 festivals, each with two
+      independent https sources that agree. Dates were read on Drik Panchang and
+      Prokerala, not recalled: Dhanteras **Fri 6 Nov 2026**, Diwali **Sun 8 Nov
+      2026**, Bhai Dooj **Wed 11 Nov 2026** (the 10 Nov reading is noted in the
+      file and not used). 2027 is deliberately absent: it has not been read yet.
+- [x] `src/lib/festivals/select.ts` — pure selection on Asia/Kolkata dates:
+      today wins over upcoming, upcoming beats a just-finished festival, priority
+      breaks ties, `verified: false` never renders, an impossible date is refused
+      rather than rolled over.
+- [x] `src/lib/festivals/service.ts` — `use cache` + `cacheLife("minutes")`, no
+      network call, so the strip can never fail or depend on a provider.
+- [x] `src/components/festivals/FestivalStrip.tsx` — slim band under the header on
+      `/` and `/collections`: name, date, countdown, one factual line, three real
+      collection links, WhatsApp CTA. Renders nothing when no window is open.
+- [x] EN + HI copy (`festival.*` keys). No offer, discount or urgency anywhere.
+- [x] Tests: `tests/festivals-data.test.ts` (integrity, two sources, real dates),
+      `tests/festivals-select.test.ts` (windows, priority, leap day, IST
+      boundary, multi-day, trail day, unverified).
+
+### Resilience layer (PHASE 1)
+
+- [x] `src/lib/safeFetch.ts` — timeout, 3 attempts, retry only network/5xx/429,
+      optional Zod schema, typed `Result`, never throws, one JSON log line that
+      contains no URL and no secret. Now the transport under
+      `rates/fx.ts → fetchJsonWithRetry`, so the rate feeds gained a timeout.
+- [x] `src/lib/env.ts` — named configuration problems (bad percentage, trailing
+      slash, half-configured Supabase, short cron secret) without printing values.
+- [x] `/api/health` — public-safe states for rates (with age), database, scheduled
+      job, festival dates, media and config; `down` + 503 only when the rate board
+      has no value at all.
+- [x] `.github/workflows/uptime.yml` — every 30 minutes, opens/comments on a
+      GitHub issue with the cause when the site is unhealthy.
+- [x] `scripts/smoke-live.mjs` now checks `/api/health`.
+- [x] `docs/OPERATIONS.md` — runbook: daily/weekly, missing rate, adding next
+      year's festivals, Supabase pause, backups, Vercel Hobby terms, key rotation.
+
+### Not built, and why
+
+- No `festival_offers` table and no admin approval UI: offers are the owner's own
+  words and there is no Supabase project attached yet. Dates are code-reviewed
+  with two sources instead of DB-approved, which is the stricter path for now.
+- No Playwright/axe/Lighthouse: no browser runner in this repository. The unit
+  suite plus the HTTP smoke test are what actually runs.
+- 2027–2030 dates are not seeded. Inventing them would put a wrong date on the
+  site; `docs/OPERATIONS.md §4` says exactly how to add a year in ten minutes.
+
+---
+
 ## 0a. Final prompt phases — status (2026-10-19)
 
 Each phase of the final build prompt, with what is finished and what is blocked on the

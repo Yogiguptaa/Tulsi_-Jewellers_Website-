@@ -479,6 +479,13 @@ export const en = {
   "share.whatsapp": "Share on WhatsApp",
   "share.native": "Share…",
 
+  /* Festival strip */
+  "festival.today": "Today",
+  "festival.tomorrow": "Tomorrow",
+  "festival.inDays": "{days} days to go",
+  "festival.greeting": "Happy {name}",
+  "festival.cta": "Enquire on WhatsApp",
+
   /* Structured / misc */
   "seo.guideSuffix": "Guide",
   "misc.pageNotFound": "Page not found"
