@@ -310,35 +310,6 @@ export const DESIGNS: DesignStyle[] = [
     enquiry: "silver anklets or toe rings",
   },
   {
-    slug: "fashion-and-costume-jewellery",
-    name: { en: "Fashion and costume jewellery", hi: "फैशन और कॉस्ट्यूम ज्वेलरी" },
-    kicker: { en: "Fancy", hi: "फैंसी" },
-    summary: {
-      en: "Everyday fashion pieces in base metal, alloy or silver-tone finish — look, not investment.",
-      hi: "बेस मेटल, मिश्र धातु या सिल्वर-टोन फिनिश में रोज़ के फैशन गहने — रूप के लिए, निवेश के लिए नहीं।",
-    },
-    description: {
-      en: "Fancy jewellery is chosen for a colour, an outfit or a function, so it is bought for how it looks rather than for metal value. These pieces are made in base metal, alloy or a plated finish, and the plating is what wears first with perfume, water and repeated use. That is not a fault — it is what the price buys. If you want a piece that keeps its value, choose gold or silver; if you want a style for a season, this range is the practical choice.",
-      hi: "फैंसी ज्वेलरी किसी रंग, कपड़े या समारोह के लिए चुनी जाती है, इसलिए इसे धातु के मूल्य से अधिक रूप के लिए खरीदा जाता है। ये टुकड़े बेस मेटल, मिश्र धातु या प्लेटेड फिनिश में बनते हैं, और इत्र, पानी तथा बार-बार इस्तेमाल से सबसे पहले प्लेटिंग घिसती है। यह खराबी नहीं — कीमत में यही मिलता है। अगर ऐसा गहना चाहिए जिसकी कीमत बनी रहे तो सोना या चांदी चुनें; एक सीज़न का स्टाइल चाहिए तो यह रेंज व्यावहारिक है।",
-    },
-    occasions: [
-      { en: "A function or a party outfit", hi: "समारोह या पार्टी के कपड़ों के साथ" },
-      { en: "A colour to match one saree or kurta", hi: "किसी एक साड़ी या कुर्ते से मिलता रंग" },
-      { en: "Travel, where a costly piece is left at home", hi: "सफ़र, जहाँ महँगा गहना घर पर छोड़ा जाता है" },
-    ],
-    metals: {
-      en: "Base metal or alloy with a plated finish; not sold by weight and not hallmarked as gold.",
-      hi: "बेस मेटल या मिश्र धातु पर प्लेटेड फिनिश; वज़न से नहीं बिकती और सोने की हॉलमार्क नहीं होती।",
-    },
-    care: {
-      en: "Keep it away from perfume and water, and store each piece separately so the plating is not rubbed.",
-      hi: "इत्र और पानी से दूर रखें, और हर टुकड़ा अलग रखें ताकि प्लेटिंग रगड़ से न उतरे।",
-    },
-    images: ["costumeJewellery1", "costumeJewellery2", "costumeJewellery3"],
-    guideSlug: "jewellery-care",
-    enquiry: "a fancy or costume jewellery piece",
-  },
-  {
     slug: "silver-and-pearls",
     name: { en: "Silver and pearls", hi: "चांदी और मोती" },
     kicker: { en: "Silver", hi: "चांदी" },
@@ -462,7 +433,7 @@ export const COLLECTION_DESIGN_SLUGS: Record<string, string[]> = {
   "gold-biscuits": ["gold-coins-and-biscuits"],
   "silver-jewellery": ["silver-anklets-and-toe-rings", "silver-and-pearls"],
   "diamond-jewellery": ["diamond-and-gemstone-rings"],
-  "fancy-jewellery": ["fashion-and-costume-jewellery"],
+  "fancy-jewellery": ["kada-and-bangles", "chains-and-pendants", "jhumka-earrings"],
   gems: ["diamond-and-gemstone-rings", "silver-and-pearls"],
 };
 

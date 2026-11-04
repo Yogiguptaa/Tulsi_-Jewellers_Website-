@@ -633,69 +633,6 @@
       "blurDataURL": "data:image/webp;base64,UklGRkgAAABXRUJQVlA4IDwAAACwAwCdASoNABQAPwFwsE6rJyUiMAgBYCAJZQAAW+oKOkHP4GIVgAD+7cK/+qz7Awom1mhpxammtD4AAAA="
     },
     {
-      "key": "costumeJewellery1",
-      "src": "/media/stock/costumeJewellery1.webp",
-      "width": 1501,
-      "height": 2000,
-      "category": "fancy",
-      "alt": {
-        "en": "Vintage costume jewellery necklace set with coloured stones",
-        "hi": "रंगीन पत्थरों वाला पुराना कॉस्ट्यूम ज्वेलरी नेकलेस सेट"
-      },
-      "credit": {
-        "provider": "Wikimedia Commons",
-        "title": "File:Vintage costume jewellery 01.jpg",
-        "creator": "Smirkybec",
-        "license": "CC BY-SA 4.0",
-        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-        "page": "https://commons.wikimedia.org/wiki/File:Vintage_costume_jewellery_01.jpg",
-        "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/1/14/Vintage_costume_jewellery_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
-      },
-      "blurDataURL": "data:image/webp;base64,UklGRkwAAABXRUJQVlA4IEAAAADQAwCdASoPABQAPwFusFArJqSisAgBYCAJZwAAW+qS4kzV1tKvRAAA/sLrXR8So+HD4qZIPDkVaDGVxSzqAAAA"
-    },
-    {
-      "key": "costumeJewellery2",
-      "src": "/media/stock/costumeJewellery2.webp",
-      "width": 1500,
-      "height": 2000,
-      "category": "fancy",
-      "alt": {
-        "en": "Vintage costume jewellery piece with a gold-tone setting",
-        "hi": "सुनहरी जड़ाई वाला पुराना कॉस्ट्यूम ज्वेलरी टुकड़ा"
-      },
-      "credit": {
-        "provider": "Wikimedia Commons",
-        "title": "File:Vintage costume jewellery 02.jpg",
-        "creator": "Smirkybec",
-        "license": "CC BY-SA 4.0",
-        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-        "page": "https://commons.wikimedia.org/wiki/File:Vintage_costume_jewellery_02.jpg",
-        "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Vintage_costume_jewellery_02.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
-      },
-      "blurDataURL": "data:image/webp;base64,UklGRlAAAABXRUJQVlA4IEQAAABwAwCdASoPABQAPwFssE+rJiSiMAgBYCAJZwAAW+uNHZZL1QAA/up57ZuGFWeFQgH0BRmmPe4HMU/dGNqs2i3F/A4AAA=="
-    },
-    {
-      "key": "costumeJewellery3",
-      "src": "/media/stock/costumeJewellery3.webp",
-      "width": 1500,
-      "height": 2000,
-      "category": "fancy",
-      "alt": {
-        "en": "Vintage costume jewellery earrings and pendant set",
-        "hi": "पुराना कॉस्ट्यूम ज्वेलरी झुमका और पेंडेंट सेट"
-      },
-      "credit": {
-        "provider": "Wikimedia Commons",
-        "title": "File:Vintage costume jewellery 03.jpg",
-        "creator": "Smirkybec",
-        "license": "CC BY-SA 4.0",
-        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-        "page": "https://commons.wikimedia.org/wiki/File:Vintage_costume_jewellery_03.jpg",
-        "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Vintage_costume_jewellery_03.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
-      },
-      "blurDataURL": "data:image/webp;base64,UklGRkoAAABXRUJQVlA4ID4AAACQAwCdASoPABQAPwFwrk+rJqQiMAgBYCAJaQAAW+sZknB9q5cAAP7nBIl3NsTM/1DGmDm950j2CIjtEIAAAA=="
-    },
-    {
       "key": "toeRingsSilver",
       "src": "/media/stock/toeRingsSilver.webp",
       "width": 1600,

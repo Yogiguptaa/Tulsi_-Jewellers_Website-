@@ -295,10 +295,10 @@ export const COLLECTIONS: CollectionSeed[] = [
   },
   {
     slug: "fancy-jewellery",
-    name: { en: "Fancy Jewellery", hi: "फैंसी ज्वेलरी" },
+    name: { en: "Fancy Gold", hi: "फैंसी गोल्ड" },
     description: {
-      en: "Fashion and artificial jewellery for everyday wear.",
-      hi: "रोज़ पहनने के लिए फैशन और आर्टिफिशियल ज्वेलरी।",
+      en: "Lightweight and trending gold designs for everyday and festive wear.",
+      hi: "रोज़ और त्योहारों के लिए हल्के और ट्रेंडी सोने के डिज़ाइन।",
     },
   },
   {

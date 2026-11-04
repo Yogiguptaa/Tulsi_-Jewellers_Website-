@@ -41,6 +41,7 @@ import type { ApiRatesPayload } from "@/lib/rates/api-payload";
 import TrustGrid from "@/components/content/TrustGrid";
 import TrendingStyles from "@/components/content/TrendingStyles";
 import BangleShowcase from "@/components/content/BangleShowcase";
+import FestiveWomenBand from "@/components/content/FestiveWomenBand";
 import ReviewCarousel from "@/components/content/ReviewCarousel";
 
 /**
@@ -245,6 +246,8 @@ export default function HomeView({
       ) : null}
 
       {/* Popular designs — style, not stock. */}
+      <FestiveWomenBand />
+
       <TrendingStyles />
 
       {/* The bangle room: a mosaic of four styles, each with its own enquiry. */}

@@ -24,6 +24,7 @@
     "check:rates": "node scripts/check-rate-provider.mjs",
     "rates:fetch": "node scripts/fetch-rates.mjs",
     "sync:media": "node scripts/sync-media.ts",
+    "sync:collections": "node scripts/sync-collections.ts",
     "media:manifest": "node scripts/build-media-manifest.mjs",
     "qr": "node scripts/generate-qr.mjs"
   },
@@ -46,6 +47,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.2",
     "qrcode": "^1.5.4",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^3.2.7",
