@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "generatedAt": null,
+  "note": "Empty on purpose. Run `npm run catalogue:import` after adding rows to content/catalogue/products.csv. Nothing here is invented inventory: the site keeps its honest empty state until the showroom's own photographed pieces are imported.",
+  "products": []
+}

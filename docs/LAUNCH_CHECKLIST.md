@@ -19,7 +19,7 @@ Everything customer-visible comes from `src/lib/config.ts`.
 | 3 | Opening hours | `CONTACT.hours` **and** `HOURS_SCHEDULE` | ✅ Mon–Sat 10:30–21:00, Sunday closed — ⚠️ both must change together, or the "Open now" label will be wrong |
 | 4 | Email | `CONTACT.email` | ⬜ blank on purpose; the footer hides the row until you supply one |
 | 5 | Map coordinates | `CONTACT.latitude` / `longitude` | ✅ street-accurate pin; replace with the shopfront pin for exact distances |
-| 6 | Google Maps link | `CONTACT.googleMapsLink` | ✅ searches the street address — no API key, no billing |
+| 6 | Google Maps link | `NEXT_PUBLIC_GOOGLE_MAPS_URL` / `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_URL` (Vercel env, then redeploy) | ✅ falls back to a street-address search — paste your own Share link to point at the shop's pin; no API key, no billing |
 | 7 | Instagram / Facebook | `CONTACT.instagram` / `facebook` | ⬜ blank; footer hides them |
 | 8 | Tax number | `CONTACT.gstNumber` | ⬜ blank; printed on your bill, never on the site. Rate cards deliberately show no tax line — they say *“Rates shown are indicative. Final price depends on the product, making charges and applicable taxes, confirmed at Tulsi Jewellers.”* |
 | 9 | Established year | `CONTACT.establishedYear` | ✅ 1990 from the public listing — ⚠️ correct if wrong |

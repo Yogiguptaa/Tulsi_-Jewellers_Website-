@@ -79,6 +79,61 @@ const ITEMS = [
     },
   },
   {
+    key: "costumeJewellery1",
+    title: "File:Vintage costume jewellery 01.jpg",
+    category: "fancy",
+    alt: {
+      en: "Vintage costume jewellery necklace set with coloured stones",
+      hi: "रंगीन पत्थरों वाला पुराना कॉस्ट्यूम ज्वेलरी नेकलेस सेट",
+    },
+  },
+  {
+    key: "costumeJewellery2",
+    title: "File:Vintage costume jewellery 02.jpg",
+    category: "fancy",
+    alt: {
+      en: "Vintage costume jewellery piece with a gold-tone setting",
+      hi: "सुनहरी जड़ाई वाला पुराना कॉस्ट्यूम ज्वेलरी टुकड़ा",
+    },
+  },
+  {
+    key: "costumeJewellery3",
+    title: "File:Vintage costume jewellery 03.jpg",
+    category: "fancy",
+    alt: {
+      en: "Vintage costume jewellery earrings and pendant set",
+      hi: "पुराना कॉस्ट्यूम ज्वेलरी झुमका और पेंडेंट सेट",
+    },
+  },
+  {
+    key: "toeRingsSilver",
+    title: "File:Toe Rings (1800s) Unkown India 1916.229.jpg",
+    category: "silver",
+    alt: {
+      en: "Set of Indian silver toe rings from the 1800s",
+      hi: "1800 के दशक की भारतीय चांदी की बिछिया",
+    },
+  },
+  {
+    key: "kundanNecklaceMuseum",
+    title: "File:British Museum The Islamic world Necklace Kundan India 21022019 7703.jpg",
+    category: "necklaces",
+    alt: {
+      en: "Kundan-set Indian necklace with coloured stones",
+      hi: "रंगीन पत्थरों से जड़ा भारतीय कुंदन हार",
+    },
+  },
+  {
+    key: "hansliNecklace",
+    title:
+      "File:Hansli (necklace), India, possibly Bikaner, Rajasthan, Mughal period, 18th century, gold, diamonds, pearls, enamel - Royal Ontario Museum - DSC04553.JPG",
+    category: "necklaces",
+    alt: {
+      en: "Hansli necklace in gold with diamonds, pearls and enamel",
+      hi: "हीरे, मोती और मीनाकारी वाला सोने का हंसली हार",
+    },
+  },
+  {
     key: "goldNecklaceIndia",
     title:
       "File:Ceremonial welcome necklace given to First Lady Jacqueline Kennedy by Prime Minister Nehru during her state visit to India in 1962 (6).jpg",

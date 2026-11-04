@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { COLLECTIONS, pick } from "@/lib/config";
 import { getCatalogue } from "@/lib/catalogue/source";
 import { breadcrumbJsonLd, buildMetadata, jsonLdGraph } from "@/lib/seo";
+import { designPhotosForCollection } from "@/lib/designs";
 import { CollectionDetailView } from "@/components/views/catalogue-views";
 import JsonLd from "@/components/seo/JsonLd";
 
@@ -40,6 +41,9 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
   if (!collection) notFound();
 
   const { products } = await getCatalogue();
+  // Computed here rather than in the view: the client keeps only the photograph
+  // key, style name and link, not the whole design guide.
+  const designPhotos = designPhotosForCollection(slug);
 
   return (
     <>
@@ -52,7 +56,11 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
           ]),
         ])}
       />
-      <CollectionDetailView collection={collection} products={products} />
+      <CollectionDetailView
+        collection={collection}
+        products={products}
+        designPhotos={designPhotos}
+      />
     </>
   );
 }

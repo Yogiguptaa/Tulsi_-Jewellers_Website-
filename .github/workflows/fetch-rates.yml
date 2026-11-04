@@ -44,14 +44,24 @@ jobs:
     timeout-minutes: 6
     steps:
       - name: Check the deployment secret
+        id: secret
         run: |
           if [ -z "${{ secrets.CRON_SECRET }}" ]; then
-            echo "::error title=CRON_SECRET is missing::Add CRON_SECRET under Settings → Secrets and variables → Actions. It must be exactly the same value as the CRON_SECRET environment variable in Vercel (Production and Preview). Without it the endpoint refuses to run."
-            exit 1
+            # A missing secret is configuration, not a code failure. Marking the
+            # run red every morning trained everyone to ignore the badge, and a
+            # real server error then looked identical. The site's own Vercel cron
+            # still runs at 04:00 UTC; this job is the safety net for it.
+            echo "::warning title=CRON_SECRET is not set::Add CRON_SECRET under Settings → Secrets and variables → Actions (same value as the Vercel environment variable). Until then this safety-net run is skipped; Vercel Cron still fetches rates daily."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "### Rates workflow skipped — CRON_SECRET is not configured." >> "$GITHUB_STEP_SUMMARY"
+            echo "Vercel Cron still calls /api/cron/fetch-rates at 04:00 UTC. To enable this retry run, add the CRON_SECRET repository secret." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
           fi
+          echo "configured=true" >> "$GITHUB_OUTPUT"
           echo "Calling ${SITE_URL%/}/api/cron/fetch-rates"
 
       - name: Trigger the rate job
+        if: steps.secret.outputs.configured == 'true'
         run: |
           set -uo pipefail
           url="${SITE_URL%/}/api/cron/fetch-rates"

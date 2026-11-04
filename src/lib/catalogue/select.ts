@@ -3,10 +3,14 @@
  *
  * Kept dependency-free and synchronous so the same helpers run on the server
  * (collection pages) and in the client catalogue browser.
+ *
+ * Filters combine with AND, including the provenance filter: choosing "Showroom
+ * pieces" must never leave an inspiration tile in the results.
  */
 
 import { COLLECTIONS, GEMSTONES, pick, type Lang } from "@/lib/config";
 import { JEWEL_TYPE_BY_SLUG } from "./jewel-types";
+import { styleLabel } from "./catalogue-kind";
 import type { CatalogueFilters, Product, SortKey } from "./types";
 
 export function normalise(value: string): string {
@@ -29,12 +33,18 @@ export function searchText(product: Product): string {
       product.metal,
       product.purity ?? "",
       product.gemstone ?? "",
+      product.style ?? "",
+      product.supplier?.name ?? "",
+      product.catalogueType,
       gemstone?.name.en ?? "",
       gemstone?.name.hi ?? "",
       collection?.name.en ?? "",
       collection?.name.hi ?? "",
       type?.name.en ?? "",
       type?.name.hi ?? "",
+      // "24k gold", "silver 925" and the style label people actually type.
+      product.purity ? `${product.purity} ${product.metal}` : "",
+      product.style ? styleLabel(product.style, "en") : "",
     ].join(" "),
   );
 }
@@ -72,6 +82,8 @@ export function filterProducts(list: Product[], filters: CatalogueFilters): Prod
     if (filters.type) {
       if (!matchesJewelTypeSlug(product, filters.type)) return false;
     }
+    if (filters.catalogueType && product.catalogueType !== filters.catalogueType) return false;
+    if (filters.style && product.style !== filters.style) return false;
     if (filters.metal && product.metal !== filters.metal) return false;
     if (filters.purity && product.purity !== filters.purity) return false;
     if (filters.gender && product.gender !== filters.gender) return false;
@@ -93,10 +105,11 @@ export function sortProducts(list: Product[], sort: SortKey = "featured", lang: 
     case "newest":
       return copy.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     case "price_asc":
-      // On-enquiry products (no price) always sort last, never as ₹0.
-      return copy.sort((a, b) => priceRank(a) - priceRank(b));
+      // On-enquiry products (no price) always sort last, never as ₹0 and never
+      // as the cheapest thing in the grid.
+      return copy.sort((a, b) => comparePrice(a, b, 1));
     case "price_desc":
-      return copy.sort((a, b) => priceRank(b) - priceRank(a));
+      return copy.sort((a, b) => comparePrice(a, b, -1));
     case "name_asc":
       return copy.sort((a, b) => pick(a.name, lang).localeCompare(pick(b.name, lang)));
     case "featured":
@@ -108,22 +121,37 @@ export function sortProducts(list: Product[], sort: SortKey = "featured", lang: 
   }
 }
 
-/** Sortable price: unpriced products are pushed to the end in both directions. */
-function priceRank(product: Product): number {
-  return product.priceINR ?? Number.POSITIVE_INFINITY;
+/**
+ * Price order that leaves unpriced products at the end in BOTH directions.
+ * A plain numeric sort cannot do that: `Infinity` is last ascending but first
+ * descending, which would have put every "Price on Enquiry" piece at the top of
+ * a "high to low" list.
+ */
+function comparePrice(a: Product, b: Product, direction: 1 | -1): number {
+  const aPriced = a.priceINR !== null;
+  const bPriced = b.priceINR !== null;
+  if (aPriced !== bPriced) return aPriced ? -1 : 1;
+  if (!aPriced || !bPriced) return a.name.en.localeCompare(b.name.en);
+  return (a.priceINR! - b.priceINR!) * direction;
 }
 
 export function getFeatured(list: Product[], limit = 8): Product[] {
   return list.filter((product) => product.isFeatured).slice(0, limit);
 }
 
+/**
+ * Related designs. Same provenance scores highest: a showroom piece should not
+ * have a supplier design presented beside it as if it were also on the shelf.
+ */
 export function getRelated(list: Product[], product: Product, limit = 4): Product[] {
   const scored = list
     .filter((candidate) => candidate.code !== product.code)
     .map((candidate) => {
       let score = 0;
+      if (candidate.catalogueType === product.catalogueType) score += 3;
       if (candidate.categorySlug === product.categorySlug) score += 3;
       if (candidate.type === product.type) score += 2;
+      if (candidate.style && candidate.style === product.style) score += 2;
       if (candidate.metal === product.metal) score += 1;
       if (candidate.purity && candidate.purity === product.purity) score += 1;
       return { candidate, score };
@@ -148,6 +176,9 @@ export function availableFacets(list: Product[]) {
     genders: uniq(list.map((product) => product.gender)),
     occasions: uniq(list.map((product) => product.occasion)),
     gemstones: uniq(list.map((product) => product.gemstone).filter((v): v is string => Boolean(v))),
+    styles: uniq(list.map((product) => product.style).filter((v): v is string => Boolean(v))),
+    catalogueTypes: uniq(list.map((product) => product.catalogueType)),
+    availabilities: uniq(list.map((product) => product.availability)),
     hasPrices: list.some((product) => product.priceINR !== null),
     categories: uniq(list.map((product) => product.categorySlug)),
   };

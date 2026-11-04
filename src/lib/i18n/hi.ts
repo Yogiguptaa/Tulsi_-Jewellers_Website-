@@ -238,6 +238,17 @@ export const hi: Dictionary = {
   "collections.count": "{count} लिस्टिंग",
   "collections.explore": "संग्रह देखें",
 
+  /* Collection design wall */
+  "designStyles.kicker": "डिज़ाइन शैलियाँ",
+  "designStyles.title": "इस संग्रह के डिज़ाइन",
+  "designStyles.note":
+    "शोरूम में बनने वाली शैलियों की दीवार। तस्वीरें डिज़ाइन दिखाती हैं; काउंटर पर रखे गहने बदलते रहते हैं, इसलिए आज क्या उपलब्ध है, हमसे पूछें।",
+  "designStyles.count": "{count} तस्वीरें",
+  "designStyles.more": "{count} और डिज़ाइन देखें",
+  "designStyles.allShown": "इस संग्रह के सारे डिज़ाइन आप देख चुके हैं।",
+  "designStyles.ask": "काउंटर पर क्या है, पूछें",
+  "designStyles.video": "वीडियो",
+
   /* Wishlist */
   "wishlist.title": "विशलिस्ट",
   "wishlist.subtitle": "इस ब्राउज़र में सहेजी गई वस्तुएँ।",

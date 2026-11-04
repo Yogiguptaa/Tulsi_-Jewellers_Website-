@@ -21,6 +21,10 @@ export const metadata: Metadata = {
 };
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  // Short commit of the running deployment: the admin panel and /api/version
+  // must name the same build. Public visitors never see this.
+  const shortSha = (process.env.VERCEL_GIT_COMMIT_SHA ?? "").slice(0, 7);
+
   return (
     <div className="min-h-screen bg-ivory">
       <header className="border-b border-gold/40 bg-maroon text-offwhite">
@@ -52,6 +56,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {children}
         </main>
       </div>
+
+      <footer className="container-page flex flex-wrap items-center gap-2 pb-6 text-[11px] text-charcoal/40">
+        <span>Tulsi Jewellers admin</span>
+        {shortSha ? (
+          <span aria-label="Deployed commit">v{shortSha}</span>
+        ) : null}
+      </footer>
     </div>
   );
 }

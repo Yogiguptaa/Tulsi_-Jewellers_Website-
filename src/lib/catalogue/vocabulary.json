@@ -1,0 +1,35 @@
+{
+  "_comment": "Read by scripts/import-products.mjs (plain Node, no TypeScript). The TypeScript enums in src/lib/catalogue/types.ts and the COLLECTIONS in src/lib/config.ts remain the source of truth; tests/catalogue.test.ts fails if these lists drift from them. Update both together.",
+  "collections": [
+    "gold-jewellery",
+    "gold-coins",
+    "gold-biscuits",
+    "silver-jewellery",
+    "diamond-jewellery",
+    "fancy-jewellery",
+    "gems"
+  ],
+  "types": [
+    "rings",
+    "necklaces",
+    "earrings",
+    "bangles",
+    "bracelets",
+    "chains",
+    "pendants",
+    "mangalsutra",
+    "necklace-sets",
+    "anklets",
+    "coins-bars",
+    "idols",
+    "gemstones"
+  ],
+  "metals": ["gold", "silver", "fashion", "gemstone"],
+  "purities": ["24K", "22K", "20K", "18K", "14K", "925", "other"],
+  "genders": ["women", "men", "kids", "unisex"],
+  "occasions": ["bridal", "daily", "festive", "gifting"],
+  "availability": ["on_enquiry", "in_stock", "sold_out"],
+  "catalogueTypes": ["showroom", "inspiration", "supplier"],
+  "gemstones": ["ruby", "citrine-topaz", "emerald", "sapphire", "pearl", "amethyst"],
+  "remoteImageHosts": ["res.cloudinary.com"]
+}

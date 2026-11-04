@@ -1,27 +1,48 @@
 /**
  * catalogue/source.ts — SERVER-ONLY catalogue access.
  *
- * Two modes, chosen automatically:
- *   1. Supabase configured (`NEXT_PUBLIC_SUPABASE_URL` + anon key) → reads the
- *      active products from Postgres (RLS only exposes `status = 'active'`).
- *   2. Not configured, empty, or unreachable → returns NO products. The site then
- *      shows the honest "new designs arriving" state instead of invented
- *      inventory. A visitor must never see a piece the showroom does not have.
+ * Three sources, merged in this order:
+ *
+ *   1. The static JSON catalogue (src/content/catalogue/products.json), read from
+ *      disk with no network at all. This is the catalogue that always works, and
+ *      it is what "the site still loads when an external service is down" means
+ *      in practice.
+ *   2. Supabase, when it is configured: the admin panel's active products. A row
+ *      from the database wins over a static row with the same code, so an edit in
+ *      the panel is what customers see.
+ *   3. Nothing. The pages then show the honest "new designs arriving" state
+ *      instead of invented inventory.
  *
  * Reads are wrapped in `use cache` because the catalogue is identical for every
  * visitor; the tag lets the admin panel invalidate it after a product change.
+ * A failure in step 2 is logged as a count only and never takes the catalogue
+ * down — step 1 has already produced a result by then.
+ *
  * Never import this module from a client component.
  */
 
 import { cacheLife, cacheTag } from "next/cache";
 import { publicSupabase } from "@/lib/supabase/public";
-import type { Availability, Gender, Metal, Occasion, PriceType, Product, Purity } from "./types";
-import type { JewelTypeSlug } from "./types";
+import type {
+  Availability,
+  CatalogueType,
+  Gender,
+  JewelTypeSlug,
+  Metal,
+  Occasion,
+  PriceType,
+  Product,
+  Purity,
+  SupplierSource,
+} from "./types";
+import { loadStaticCatalogue } from "./static";
 
 export type CatalogueResult = {
   products: Product[];
-  /** "database" → live Postgres rows, "empty" → nothing published yet. */
-  source: "database" | "empty";
+  /** Where the visible rows came from. */
+  source: "static" | "database" | "mixed" | "empty";
+  /** Rows rejected by validation, for the health check. No content, just counts. */
+  rejected: number;
 };
 
 type ProductImageRow = {
@@ -48,6 +69,11 @@ type ProductRow = {
   availability: Availability | null;
   is_featured: boolean | null;
   created_at: string | null;
+  catalogue_type?: CatalogueType | null;
+  style?: string | null;
+  supplier_name?: string | null;
+  supplier_ref?: string | null;
+  updated_at?: string | null;
   categories: { slug: string } | { slug: string }[] | null;
   product_images: ProductImageRow[] | null;
 };
@@ -74,7 +100,9 @@ const BASE_COLUMNS =
  * a deployment that has not run it yet falls back to `BASE_COLUMNS` instead of
  * failing, and the filters then simply match nothing instead of lying.
  */
-const EXTENDED_COLUMNS = `${BASE_COLUMNS}, jewelry_type, gender, occasion, stone_detail`;
+const EXTENDED_COLUMNS =
+  `${BASE_COLUMNS}, jewelry_type, gender, occasion, stone_detail, style, ` +
+  "catalogue_type, supplier_name, supplier_ref, updated_at";
 
 function first<T>(value: T | T[] | null): T | null {
   if (Array.isArray(value)) return value[0] ?? null;
@@ -90,7 +118,6 @@ function toNumber(value: number | string | null): number | null {
 function priceTypeFromRow(row: ProductRowWithFilters): PriceType {
   if (row.availability === "sold_out") return "unavailable";
   if (row.is_price_on_request === false && toNumber(row.price_inr) !== null) return "fixed";
-  if (row.availability === "on_enquiry") return "on_enquiry";
   return "on_enquiry";
 }
 
@@ -103,6 +130,12 @@ function mapRow(row: ProductRowWithFilters): Product {
     })
     .map((image) => image.url);
 
+  const catalogueType: CatalogueType = row.catalogue_type ?? "showroom";
+  const supplier: SupplierSource | null =
+    catalogueType === "supplier" && row.supplier_name
+      ? { name: row.supplier_name, ref: row.supplier_ref ?? null, url: null }
+      : null;
+
   return {
     code: row.code,
     slug: row.slug,
@@ -110,6 +143,7 @@ function mapRow(row: ProductRowWithFilters): Product {
     description: { en: row.description_en ?? "", hi: row.description_hi ?? "" },
     categorySlug: category?.slug ?? "",
     type: (row.jewelry_type ?? "necklaces") as JewelTypeSlug,
+    style: row.style ?? null,
     metal: (row.metal ?? "gold") as Metal,
     purity: row.purity ?? null,
     gender: (row.gender ?? "unisex") as Gender,
@@ -124,7 +158,9 @@ function mapRow(row: ProductRowWithFilters): Product {
     createdAt: row.created_at ?? "1970-01-01T00:00:00.000Z",
     imageKeys: images,
     specs: [],
-    // Rows that came from Postgres are real inventory, not fixtures.
+    catalogueType,
+    supplier,
+    lastUpdated: (row.updated_at ?? row.created_at ?? "").slice(0, 10) || "unknown",
   };
 }
 
@@ -137,32 +173,62 @@ export async function getCatalogue(): Promise<CatalogueResult> {
   cacheLife("hours");
   cacheTag("catalogue");
 
+  const staticCatalogue = loadStaticCatalogue();
+  const merged = new Map<string, Product>(
+    staticCatalogue.products.map((product) => [product.code.toLowerCase(), product]),
+  );
+
   const supabase = publicSupabase();
-  if (!supabase) return { products: [], source: "empty" };
+  if (!supabase) {
+    return {
+      products: [...merged.values()],
+      source: merged.size > 0 ? "static" : "empty",
+      rejected: staticCatalogue.rejected.length,
+    };
+  }
 
   try {
     const query = (columns: string) =>
-      supabase
-        .from("products")
-        .select(columns)
-        .eq("status", "active")
-        .order("sort_order", { ascending: true });
+      supabase.from("products").select(columns).eq("status", "active").order("sort_order", {
+        ascending: true,
+      });
 
     let { data, error } = await query(EXTENDED_COLUMNS);
     if (error) {
-      // Almost certainly `column products.jewelry_type does not exist` — the
-      // Stage 2.1 migration has not been applied to this database yet.
+      // Almost certainly `column products.catalogue_type does not exist` — the
+      // provenance migration has not been applied to this database yet.
       ({ data, error } = await query(BASE_COLUMNS));
     }
-
     if (error) throw error;
+
     const rows = (data ?? []) as unknown as ProductRowWithFilters[];
-    // An empty table is an empty shop, not an invitation to invent one.
-    return { products: rows.map(mapRow), source: rows.length > 0 ? "database" : "empty" };
+    const fromDb = rows.map(mapRow);
+    let overrides = 0;
+    for (const product of fromDb) {
+      const key = product.code.toLowerCase();
+      if (merged.has(key)) overrides += 1;
+      merged.set(key, product);
+    }
+
+    const products = [...merged.values()];
+    const source: CatalogueResult["source"] =
+      products.length === 0
+        ? "empty"
+        : fromDb.length === 0
+          ? "static"
+          : overrides > 0
+            ? "mixed"
+            : "database";
+
+    return { products, source, rejected: staticCatalogue.rejected.length };
   } catch {
-    // A broken connection must never take the storefront down — and must never
-    // swap in fixtures either. The pages show their empty state.
-    return { products: [], source: "empty" };
+    // A broken connection must never take the storefront down, and must never
+    // swap in invented rows either. The static catalogue stands.
+    return {
+      products: [...merged.values()],
+      source: merged.size > 0 ? "static" : "empty",
+      rejected: staticCatalogue.rejected.length,
+    };
   }
 }
 

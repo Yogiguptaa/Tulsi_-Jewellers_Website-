@@ -4,6 +4,7 @@ import { JEWEL_TYPES, JEWEL_TYPE_BY_SLUG } from "@/lib/catalogue/jewel-types";
 import { getCatalogue } from "@/lib/catalogue/source";
 import { pick } from "@/lib/config";
 import { breadcrumbJsonLd, buildMetadata, jsonLdGraph } from "@/lib/seo";
+import { designPhotosForType } from "@/lib/designs";
 import { JewelleryTypeView } from "@/components/views/catalogue-views";
 import JsonLd from "@/components/seo/JsonLd";
 
@@ -46,6 +47,7 @@ export default async function JewelleryTypePage({ params }: { params: Promise<{ 
   if (!page) notFound();
 
   const { products } = await getCatalogue();
+  const designPhotos = designPhotosForType(slug);
 
   return (
     <>
@@ -58,7 +60,7 @@ export default async function JewelleryTypePage({ params }: { params: Promise<{ 
           ]),
         ])}
       />
-      <JewelleryTypeView page={page} products={products} />
+      <JewelleryTypeView page={page} products={products} designPhotos={designPhotos} />
     </>
   );
 }

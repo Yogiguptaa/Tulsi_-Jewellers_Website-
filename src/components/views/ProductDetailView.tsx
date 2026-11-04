@@ -18,6 +18,13 @@ import { formatINR } from "@/lib/rates/format";
 import { imageCredit, imageFor } from "@/lib/catalogue/images";
 import { JEWEL_TYPE_BY_SLUG } from "@/lib/catalogue/jewel-types";
 import { getRelated } from "@/lib/catalogue/select";
+import {
+  CATALOGUE_TYPE_BADGES,
+  availabilityLabel,
+  enquiryMessage,
+  provenanceNotice,
+  supplierLine,
+} from "@/lib/catalogue/catalogue-kind";
 import type { Product } from "@/lib/catalogue/types";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import { useToast } from "@/components/providers/ToastProvider";
@@ -59,11 +66,10 @@ export default function ProductDetailView({
   }));
 
   const shareUrl = `${SITE.baseUrl.replace(/\/$/, "")}/products/${product.slug}`;
-  const enquiry = whatsappHref(
-    `Hello Tulsi Jewellers, I am interested in ${product.name.en} (${product.code}). ` +
-      "Please share the availability, weight and price.",
-  );
+  const enquiry = whatsappHref(enquiryMessage(product));
   const phone = CONTACT.phones[0];
+  const notice = provenanceNotice(product, lang);
+  const source = supplierLine(product, lang);
 
   return (
     <>
@@ -93,6 +99,12 @@ export default function ProductDetailView({
 
         <div className="space-y-5">
           <div className="flex flex-wrap items-center gap-2">
+            {/* What this piece actually is, before anything else on the page. */}
+            {product.catalogueType !== "showroom" ? (
+              <span className="rounded-sm border border-maroon/40 bg-offwhite px-2 py-0.5 text-[10px] uppercase tracking-[0.1em] text-maroon">
+                {pick(CATALOGUE_TYPE_BADGES[product.catalogueType], lang)}
+              </span>
+            ) : null}
             {product.availability === "sold_out" ? (
               <span className="rounded-sm border border-maroon/40 bg-offwhite px-2 py-0.5 text-[10px] uppercase tracking-[0.1em] text-maroon">
                 {pick(SOLD_OUT, lang)}
@@ -132,6 +144,12 @@ export default function ProductDetailView({
             {pick(product.description, lang)}
           </p>
 
+          {notice ? (
+            <Notice tone="info" title={notice.title}>
+              {notice.body}
+            </Notice>
+          ) : null}
+
           <dl className="grid grid-cols-2 gap-x-4 gap-y-3 border-y border-gold/25 py-4 text-sm">
             {product.purity ? (
               <div>
@@ -167,7 +185,23 @@ export default function ProductDetailView({
                 <dd className="text-charcoal/85">{product.stoneDetail}</dd>
               </div>
             ) : null}
+            <div className="col-span-2">
+              <dt className="text-xs uppercase tracking-[0.12em] text-charcoal/70">
+                {pick({ en: "Availability", hi: "उपलब्धता" }, lang)}
+              </dt>
+              <dd className="text-charcoal/85">{availabilityLabel(product, lang)}</dd>
+            </div>
+            {product.lastUpdated && product.lastUpdated !== "unknown" ? (
+              <div>
+                <dt className="text-xs uppercase tracking-[0.12em] text-charcoal/70">
+                  {pick({ en: "Catalogue updated", hi: "कैटलॉग अद्यतन" }, lang)}
+                </dt>
+                <dd className="text-charcoal/85">{product.lastUpdated}</dd>
+              </div>
+            ) : null}
           </dl>
+
+          {source ? <p className="text-xs text-charcoal/70">{source}</p> : null}
 
           {product.specs.length > 0 ? (
             <div className="space-y-2">

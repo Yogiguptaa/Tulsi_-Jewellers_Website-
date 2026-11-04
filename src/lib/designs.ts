@@ -131,7 +131,7 @@ export const DESIGNS: DesignStyle[] = [
       en: "Keep kundan away from water and perfume; the foil behind a stone is the part that suffers first.",
       hi: "कुंदन को पानी और इत्र से दूर रखें; पत्थर के पीछे की पन्नी सबसे पहले प्रभावित होती है।",
     },
-    images: ["bridePortrait", "bangleRubyDiamond", "earringsGold"],
+    images: ["bridePortrait", "bangleRubyDiamond", "earringsGold", "kundanNecklaceMuseum", "hansliNecklace"],
     guideSlug: "gemstone-basics",
     enquiry: "a kundan or polki piece",
   },
@@ -281,6 +281,64 @@ export const DESIGNS: DesignStyle[] = [
     enquiry: "a diamond or gemstone ring",
   },
   {
+    slug: "silver-anklets-and-toe-rings",
+    name: { en: "Silver anklets and toe rings", hi: "चांदी की पायल और बिछिया" },
+    kicker: { en: "Silver", hi: "चांदी" },
+    summary: {
+      en: "Payal, anklets and bichiya in silver — the pieces worn every day and at weddings.",
+      hi: "चांदी की पायल, घुंघरू और बिछिया — रोज़ और शादी में पहने जाने वाले गहने।",
+    },
+    description: {
+      en: "Anklets and toe rings are the part of a wedding set that stays on afterwards, which is why they are usually chosen for comfort as much as look. A payal is bought by the pair and should sit just above the ankle bone without pressing; a toe ring is sized to the toe, not to the foot. Silver is the metal for these pieces because it takes the wear and can be repaired easily. Ask for the weight of the pair, as both pieces are billed together.",
+      hi: "पायल और बिछिया शादी के सेट का वह हिस्सा हैं जो बाद में भी पहना जाता है, इसलिए इन्हें रूप के साथ आराम देखकर चुना जाता है। पायल जोड़े में खरीदी जाती है और टखने की हड्डी के ऊपर बिना दबाव के बैठनी चाहिए; बिछिया पैर के नहीं, उस उँगली के नाप की होती है। इन गहनों के लिए चांदी इसलिए चुनी जाती है कि वह रोज़ का इस्तेमाल सहती है और आसानी से ठीक हो जाती है। जोड़े का वज़न अवश्य पूछें, क्योंकि दोनों टुकड़ों का बिल एक साथ बनता है।",
+    },
+    occasions: [
+      { en: "Worn daily after marriage", hi: "शादी के बाद रोज़" },
+      { en: "A wedding set for the bride", hi: "दुल्हन के शादी के सेट में" },
+      { en: "A gift for a daughter", hi: "बेटी को उपहार" },
+    ],
+    metals: {
+      en: "Usually 925 sterling silver; some pairs are silver with a gold wash.",
+      hi: "सामान्यतः 925 स्टर्लिंग चांदी; कुछ जोड़े सोने की परत वाली चांदी के होते हैं।",
+    },
+    care: {
+      en: "Wipe anklets after wearing and keep them dry; silver darkens fastest where it touches skin.",
+      hi: "पहनने के बाद पायल पोंछें और सूखा रखें; चांदी वहीं सबसे पहले काली पड़ती है जहाँ वह त्वचा से मिलती है।",
+    },
+    images: ["silverAnklets", "toeRingsSilver"],
+    guideSlug: "jewellery-care",
+    enquiry: "silver anklets or toe rings",
+  },
+  {
+    slug: "fashion-and-costume-jewellery",
+    name: { en: "Fashion and costume jewellery", hi: "फैशन और कॉस्ट्यूम ज्वेलरी" },
+    kicker: { en: "Fancy", hi: "फैंसी" },
+    summary: {
+      en: "Everyday fashion pieces in base metal, alloy or silver-tone finish — look, not investment.",
+      hi: "बेस मेटल, मिश्र धातु या सिल्वर-टोन फिनिश में रोज़ के फैशन गहने — रूप के लिए, निवेश के लिए नहीं।",
+    },
+    description: {
+      en: "Fancy jewellery is chosen for a colour, an outfit or a function, so it is bought for how it looks rather than for metal value. These pieces are made in base metal, alloy or a plated finish, and the plating is what wears first with perfume, water and repeated use. That is not a fault — it is what the price buys. If you want a piece that keeps its value, choose gold or silver; if you want a style for a season, this range is the practical choice.",
+      hi: "फैंसी ज्वेलरी किसी रंग, कपड़े या समारोह के लिए चुनी जाती है, इसलिए इसे धातु के मूल्य से अधिक रूप के लिए खरीदा जाता है। ये टुकड़े बेस मेटल, मिश्र धातु या प्लेटेड फिनिश में बनते हैं, और इत्र, पानी तथा बार-बार इस्तेमाल से सबसे पहले प्लेटिंग घिसती है। यह खराबी नहीं — कीमत में यही मिलता है। अगर ऐसा गहना चाहिए जिसकी कीमत बनी रहे तो सोना या चांदी चुनें; एक सीज़न का स्टाइल चाहिए तो यह रेंज व्यावहारिक है।",
+    },
+    occasions: [
+      { en: "A function or a party outfit", hi: "समारोह या पार्टी के कपड़ों के साथ" },
+      { en: "A colour to match one saree or kurta", hi: "किसी एक साड़ी या कुर्ते से मिलता रंग" },
+      { en: "Travel, where a costly piece is left at home", hi: "सफ़र, जहाँ महँगा गहना घर पर छोड़ा जाता है" },
+    ],
+    metals: {
+      en: "Base metal or alloy with a plated finish; not sold by weight and not hallmarked as gold.",
+      hi: "बेस मेटल या मिश्र धातु पर प्लेटेड फिनिश; वज़न से नहीं बिकती और सोने की हॉलमार्क नहीं होती।",
+    },
+    care: {
+      en: "Keep it away from perfume and water, and store each piece separately so the plating is not rubbed.",
+      hi: "इत्र और पानी से दूर रखें, और हर टुकड़ा अलग रखें ताकि प्लेटिंग रगड़ से न उतरे।",
+    },
+    images: ["costumeJewellery1", "costumeJewellery2", "costumeJewellery3"],
+    guideSlug: "jewellery-care",
+    enquiry: "a fancy or costume jewellery piece",
+  },
+  {
     slug: "silver-and-pearls",
     name: { en: "Silver and pearls", hi: "चांदी और मोती" },
     kicker: { en: "Silver", hi: "चांदी" },
@@ -376,6 +434,106 @@ export const DESIGN_BY_SLUG: Record<string, DesignStyle> = Object.fromEntries(
 /** The photograph shown on a card, or null when the style has no photo yet. */
 export function primaryImage(design: DesignStyle): string | null {
   return design.images[0] ?? null;
+}
+
+/* -------------------------------------------------------------------------- */
+/* COLLECTION → DESIGN STYLES                                                  */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Which styles belong on each collection page.
+ *
+ * These are categories of style, not claims about the counter: the page says in
+ * words that the photographs show a style and the pieces in the showroom change.
+ * A collection absent from this map simply has no design strip.
+ */
+export const COLLECTION_DESIGN_SLUGS: Record<string, string[]> = {
+  "gold-jewellery": [
+    "bridal-necklace-sets",
+    "temple-jewellery",
+    "kundan-and-polki",
+    "jhumka-earrings",
+    "kada-and-bangles",
+    "mangalsutra",
+    "chains-and-pendants",
+    "diamond-and-gemstone-rings",
+  ],
+  "gold-coins": ["gold-coins-and-biscuits"],
+  "gold-biscuits": ["gold-coins-and-biscuits"],
+  "silver-jewellery": ["silver-anklets-and-toe-rings", "silver-and-pearls"],
+  "diamond-jewellery": ["diamond-and-gemstone-rings"],
+  "fancy-jewellery": ["fashion-and-costume-jewellery"],
+  gems: ["diamond-and-gemstone-rings", "silver-and-pearls"],
+};
+
+/**
+ * What a collection page needs to draw its design strip: one entry per unique
+ * photograph, in the order the styles are listed. Any photograph already used by
+ * an earlier style in the same collection is skipped, so a page never shows the
+ * same picture twice.
+ */
+export type DesignPhoto = {
+  key: string;
+  /** Style page the photograph belongs to. */
+  slug: string;
+  name: LocalizedText;
+  /** English phrase for the WhatsApp message. */
+  enquiry: string;
+};
+
+export function designPhotosForCollection(collectionSlug: string): DesignPhoto[] {
+  return photosFromStyles(COLLECTION_DESIGN_SLUGS[collectionSlug]);
+}
+
+/**
+ * Which styles belong on each /jewellery/<slug> page. Kept in the same place as
+ * the collection map so a style is never listed in one and forgotten in the
+ * other. Pages missing here (kids' jewellery, for example) simply show the
+ * honest empty state.
+ */
+export const JEWEL_TYPE_DESIGN_SLUGS: Record<string, string[]> = {
+  rings: ["diamond-and-gemstone-rings"],
+  necklaces: [
+    "bridal-necklace-sets",
+    "temple-jewellery",
+    "kundan-and-polki",
+    "chains-and-pendants",
+    "mangalsutra",
+  ],
+  earrings: ["jhumka-earrings"],
+  bangles: ["kada-and-bangles"],
+  bracelets: ["kada-and-bangles"],
+  chains: ["chains-and-pendants"],
+  pendants: ["chains-and-pendants"],
+  mangalsutra: ["mangalsutra"],
+  "bridal-jewellery": ["bridal-necklace-sets", "kundan-and-polki"],
+  "mens-jewellery": ["mens-chains"],
+  "womens-jewellery": [
+    "bridal-necklace-sets",
+    "jhumka-earrings",
+    "kada-and-bangles",
+    "mangalsutra",
+  ],
+  gemstones: ["diamond-and-gemstone-rings", "silver-and-pearls"],
+};
+
+export function designPhotosForType(typeSlug: string): DesignPhoto[] {
+  return photosFromStyles(JEWEL_TYPE_DESIGN_SLUGS[typeSlug]);
+}
+
+function photosFromStyles(styleSlugs: string[] | undefined): DesignPhoto[] {
+  const seen = new Set<string>();
+  const photos: DesignPhoto[] = [];
+  for (const styleSlug of styleSlugs ?? []) {
+    const design = DESIGN_BY_SLUG[styleSlug];
+    if (!design) continue;
+    for (const key of design.images) {
+      if (seen.has(key)) continue;
+      seen.add(key);
+      photos.push({ key, slug: design.slug, name: design.name, enquiry: design.enquiry });
+    }
+  }
+  return photos;
 }
 
 /** Styles with at least one photograph — used by the home page preview strip. */

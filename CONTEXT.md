@@ -5,6 +5,42 @@ Read this file first, then the stage list at the bottom.
 
 ---
 
+## 0z. STEP 0 + STEP 1 (4 Nov 2026)
+
+### STEP 0 — why nothing was appearing (diagnosed, then fixed)
+
+- [x] Cause proved: `main` == `origin/main` at `517e7cd`, with **51 uncommitted
+      entries** (26 modified tracked files, 25 new files). Vercel builds from
+      `main`, so it had no new commit to build. Not a cache fault: no service
+      worker, no `next-pwa`, no `revalidate` override.
+- [x] `/api/version` added (`src/app/api/version/route.ts`) returning
+      `{commit, shortCommit, builtAt, env, branch}` from Vercel's build env,
+      `Cache-Control: no-store`.
+- [x] Build stamp added via `next.config.ts` → `NEXT_PUBLIC_BUILD_TIME`.
+- [x] `v<short sha>` shown in the admin footer only.
+- [x] Removed `public/data/benchmark.json` (nonsense figures, unreferenced, 404 live).
+
+### STEP 1 — Indian market basis
+
+- [x] `src/lib/rates/india.ts`: 24K base → 22K ×0.916, 20K ×0.833, 18K ×0.750,
+      14K ×0.585, per-gram; silver 999/kg → per-gram and 925; validation band;
+      reference check (hold below 0.97 or above 1.30 of converted spot).
+- [x] `src/lib/rates/providers/india.ts`: publishes the verified Indian figure
+      from `content/rates/india-benchmark.json`, derives every purity, and runs
+      the reference check before publishing.
+- [x] `providers.ts`: **India is the default**; spot/MetalCharts/metals.dev are
+      explicit opt-ins. No automatic provider is chosen just because a key exists.
+- [x] `service.ts`: the international fallback is only used by an explicitly
+      international feed — the Indian board never silently becomes spot.
+- [x] Label: "India market benchmark (MCX), INR. Showroom rates may differ slightly."
+- [x] Owner workflow + derivation table: `docs/INDIA_RATES.md`.
+- [x] Tests: `tests/india-rates.test.ts` (derivation, silver, ₹0/NaN guards,
+      validation, future timestamp, age, reference rejection both sides).
+- [ ] Live check after deploy: `/api/version` commit == merged commit, and
+      `/api/rates/latest` reports the Indian source.
+
+---
+
 ## 0y. Festival engine + resilience layer (2 Nov 2026)
 
 Done in this round, verified locally against a production build:

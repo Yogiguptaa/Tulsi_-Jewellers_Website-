@@ -22,6 +22,29 @@ hidden. Home delivery outside Nagpur is **not** offered — the exact wording li
   photographs into a single plate on the home page and on `/jewellery/bangles`, each with a
   WhatsApp enquiry for that style. It is design inspiration, never stock or a price.
 
+## The product catalogue
+
+Pieces are published from a spreadsheet, not by editing pages:
+
+```bash
+npm run catalogue:import     # validate content/catalogue/products.csv → src/content/catalogue/products.json
+npm run catalogue:check      # validate only, and fail if the JSON is stale
+```
+
+- The catalogue is a checked-in JSON file, so every page renders with no database and no network.
+  When the optional Supabase panel is configured, a database row with the same product code
+  overrides the file; when it is not, the file is the whole catalogue.
+- Every piece declares its provenance — `showroom`, `inspiration` or `supplier`. The importer
+  refuses to publish an inspiration or supplier design as `in_stock` or with a fixed price, and the
+  card, quick view and product page all say which one it is.
+- It validates before writing: duplicate ids and slugs, duplicate supplier references, unknown
+  vocabulary, missing image files, non-https or non-Cloudinary image hosts, malformed dates and
+  weights. Nothing is written while any row is invalid.
+- It ships **empty**. There is no demo inventory, so the site shows its empty state until the
+  showroom's own photographed pieces are imported.
+
+Column reference, image naming, provenance rules and troubleshooting: `docs/CATALOGUE.md`.
+
 ## Getting started
 
 ```bash
@@ -48,7 +71,8 @@ Production checks, in this order:
 npm run check:placeholders   # must print ✓
 npm run check:types          # tsc --noEmit
 npm run lint                 # eslint src --max-warnings=0
-npm run verify               # the three above, in one command
+npm run catalogue:check      # CSV valid, products.json up to date
+npm run verify               # all of the above plus the unit tests, in one command
 npm run build                # next build
 ```
 
@@ -181,6 +205,9 @@ the *Feed status* card.
 | --- | --- |
 | `CONTEXT.md` | build log: what exists, decisions, stage status |
 | `docs/DEPLOY.md` | step-by-step deploy to Vercel, Netlify, Freebuff Sites, plus the domain |
+| `docs/CATALOGUE.md` | the CSV import workflow, every column, image naming and provenance rules |
+| `docs/TEAM_ROLES.md` | Owner, Catalogue Manager, Content Manager, Developer — and the access model |
+| `docs/TESTING_REPORT.md` | what was actually tested for the catalogue, with results and limits |
 | `docs/LAUNCH_CHECKLIST.md` | the launch sequence, in order |
 | `docs/ARCHITECTURE.md` | sitemap, design system, data model, security, SEO |
 | `docs/RATE_PROVIDER.md` | provider setup, cost, licence terms to confirm before going live |

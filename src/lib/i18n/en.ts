@@ -244,6 +244,17 @@ export const en = {
   "collections.count": "{count} listings",
   "collections.explore": "Explore collection",
 
+  /* Collection design wall */
+  "designStyles.kicker": "Design styles",
+  "designStyles.title": "Designs in this collection",
+  "designStyles.note":
+    "A wall of styles the showroom works in. The photographs show the design; the pieces at the counter change, so ask us what is available today.",
+  "designStyles.count": "{count} photographs",
+  "designStyles.more": "Show {count} more designs",
+  "designStyles.allShown": "You have seen every design in this collection.",
+  "designStyles.ask": "Ask what is at the counter",
+  "designStyles.video": "Video",
+
   /* Wishlist */
   "wishlist.title": "Wishlist",
   "wishlist.subtitle": "Items you have saved in this browser.",

@@ -121,6 +121,21 @@ export const CONTACT = {
    */
   latitude: 21.1544416 as number | null,
   longitude: 79.1043868 as number | null,
+  /**
+   * THE SHOWROOM'S OWN GOOGLE MAPS LINK.
+   *
+   * Paste the link from Google Maps → Share → Copy link into
+   * NEXT_PUBLIC_GOOGLE_MAPS_URL (Vercel → Settings → Environment Variables, for
+   * both Production and Preview), then redeploy. It is used for the "Get
+   * directions" button, so a customer lands on the showroom's own pin rather
+   * than on a text search.
+   *
+   * Paste the iframe address from Google Maps → Share → Embed a map into
+   * NEXT_PUBLIC_GOOGLE_MAPS_EMBED_URL to control the map itself. Without it the
+   * map falls back to a keyless address search, so nothing breaks.
+   */
+  mapsLink: (process.env.NEXT_PUBLIC_GOOGLE_MAPS_URL ?? "").trim(),
+  mapsEmbedUrl: (process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_URL ?? "").trim(),
   /** Keyless Maps link built from the street address — no API key, no billing. */
   googleMapsLink:
     "https://www.google.com/maps/search/?api=1&query=" +
@@ -191,6 +206,31 @@ export function hasMapCoordinates(): boolean {
   return typeof CONTACT.latitude === "number" && typeof CONTACT.longitude === "number";
 }
 
+/**
+ * True only for an https link, so a mistyped value (or a javascript: URL) never
+ * reaches an href or an iframe source. The owner's pasted link is data, and data
+ * from an environment variable is not automatically safe.
+ */
+export function safeHttpsUrl(value: string): string | null {
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" ? url.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+/** The showroom's own Maps link when it is valid, else the address search. */
+export function directionsHref(): string {
+  return safeHttpsUrl(CONTACT.mapsLink) ?? CONTACT.googleMapsLink;
+}
+
+/** The owner's embed URL when it is valid, else null (caller builds a fallback). */
+export function mapsEmbedUrl(): string | null {
+  return safeHttpsUrl(CONTACT.mapsEmbedUrl);
+}
+
 /* -------------------------------------------------------------------------- */
 /* DELIVERY — mandatory wording, never rephrased elsewhere                     */
 /* -------------------------------------------------------------------------- */
@@ -244,6 +284,14 @@ export const COLLECTIONS: CollectionSeed[] = [
     slug: "silver-jewellery",
     name: { en: "Silver Jewellery", hi: "चांदी के गहने" },
     description: { en: "Silver jewellery for everyday and occasions.", hi: "रोज़ और अवसरों के लिए चांदी के गहने।" },
+  },
+  {
+    slug: "diamond-jewellery",
+    name: { en: "Diamond Jewellery", hi: "हीरे के गहने" },
+    description: {
+      en: "Diamond rings, pendants and studs, with certification confirmed at the showroom.",
+      hi: "हीरे की अंगूठियाँ, पेंडेंट और स्टड, प्रमाणन शोरूम पर बताया जाता है।",
+    },
   },
   {
     slug: "fancy-jewellery",

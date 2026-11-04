@@ -2,7 +2,15 @@
 
 import { useState } from "react";
 import { MapPin, Navigation, Ruler } from "lucide-react";
-import { CONTACT, SITE, hasMapCoordinates, isPlaceholder, pick } from "@/lib/config";
+import {
+  CONTACT,
+  SITE,
+  directionsHref,
+  hasMapCoordinates,
+  isPlaceholder,
+  mapsEmbedUrl,
+  pick,
+} from "@/lib/config";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import Notice from "@/components/ui/Notice";
 
@@ -31,8 +39,13 @@ export default function ShowroomMap() {
   const query = isPlaceholder(pick(CONTACT.address, "en"))
     ? `${SITE.name.en} ${CONTACT.area.en}`
     : `${SITE.name.en}, ${pick(CONTACT.address, "en")}`;
-  const embedSrc = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&z=14&output=embed`;
-  const directionsHref = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(query)}`;
+  // The owner's own embed (Google Maps → Share → Embed a map) wins when it has
+  // been pasted into the environment; otherwise the keyless address search is
+  // used, so the map works before that step is done.
+  const embedSrc =
+    mapsEmbedUrl() ??
+    `https://maps.google.com/maps?q=${encodeURIComponent(query)}&z=14&output=embed`;
+  const mapLink = directionsHref();
 
   const computeDistance = () => {
     setDistanceError(null);
@@ -90,7 +103,7 @@ export default function ShowroomMap() {
 
       <div className="flex flex-wrap items-center gap-3">
         <a
-          href={directionsHref}
+          href={mapLink}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 rounded-sm border border-gold/50 bg-offwhite px-4 py-2.5 text-sm font-medium text-charcoal hover:bg-champagne/60"

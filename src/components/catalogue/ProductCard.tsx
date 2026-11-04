@@ -6,6 +6,12 @@ import { Eye, Heart, MessageCircle, X } from "lucide-react";
 import { formatINR } from "@/lib/rates/format";
 import { pick, whatsappHref } from "@/lib/config";
 import { imageFor } from "@/lib/catalogue/images";
+import {
+  CATALOGUE_TYPE_BADGES,
+  availabilityLabel,
+  availabilityTone,
+  enquiryMessage,
+} from "@/lib/catalogue/catalogue-kind";
 import Photo from "@/components/catalogue/Photo";
 import type { Product } from "@/lib/catalogue/types";
 import { useLanguage } from "@/components/providers/LanguageProvider";
@@ -18,11 +24,8 @@ export default function ProductCard({ product }: { product: Product }) {
   const { has, toggle } = useWishlist();
   const [quickView, setQuickView] = useState(false);
   const saved = has(product.code);
-  const soldOut = product.availability === "sold_out";
-  const enquiry = whatsappHref(
-    `Hello Tulsi Jewellers, I am interested in ${product.name.en} (${product.code}). ` +
-      "Please share more details.",
-  );
+  const tone = availabilityTone(product);
+  const enquiry = whatsappHref(enquiryMessage(product));
 
   return (
     <article className="group flex h-full flex-col overflow-hidden border border-gold/30 bg-offwhite shadow-[0_2px_18px_-14px_rgb(31_27_22_/_0.5)] transition-shadow hover:shadow-soft">
@@ -36,13 +39,24 @@ export default function ProductCard({ product }: { product: Product }) {
           />
         </Link>
 
-        {soldOut ? (
-          <div className="pointer-events-none absolute left-3 top-3 flex flex-col items-start gap-1.5">
+        {/* Provenance sits on the photograph itself, so an inspiration or supplier
+            design cannot be mistaken for showroom stock from the grid. A showroom
+            piece is labelled only once it is recorded as in stock. */}
+        <div className="pointer-events-none absolute left-3 top-3 flex flex-col items-start gap-1.5">
+          {product.catalogueType !== "showroom" ? (
+            <span className="rounded-sm border border-maroon/40 bg-offwhite/90 px-2 py-0.5 text-[10px] uppercase tracking-[0.1em] text-maroon">
+              {pick(CATALOGUE_TYPE_BADGES[product.catalogueType], lang)}
+            </span>
+          ) : tone === "out" ? (
             <span className="rounded-sm border border-maroon/40 bg-offwhite/90 px-2 py-0.5 text-[10px] uppercase tracking-[0.1em] text-maroon">
               {pick(SOLD_OUT, lang)}
             </span>
-          </div>
-        ) : null}
+          ) : tone === "stock" ? (
+            <span className="rounded-sm border border-emerald-600/40 bg-offwhite/90 px-2 py-0.5 text-[10px] uppercase tracking-[0.1em] text-emerald-700">
+              {availabilityLabel(product, lang)}
+            </span>
+          ) : null}
+        </div>
 
         <button
           type="button"
@@ -96,13 +110,20 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
         </dl>
 
-        <p className="mt-auto font-medium text-maroon">
-          {product.priceType === "fixed" && product.priceINR !== null
-            ? `₹ ${formatINR(product.priceINR)}`
-            : product.availability === "sold_out"
-              ? pick({ en: "Not available", hi: "उपलब्ध नहीं" }, lang)
-              : t("catalogue.priceOnEnquiry")}
-        </p>
+        <div className="mt-auto space-y-1">
+          <p className="font-medium text-maroon">
+            {product.priceType === "fixed" && product.priceINR !== null
+              ? `₹ ${formatINR(product.priceINR)}`
+              : product.availability === "sold_out"
+                ? pick({ en: "Not available", hi: "उपलब्ध नहीं" }, lang)
+                : t("catalogue.priceOnEnquiry")}
+          </p>
+          {product.catalogueType !== "showroom" ? (
+            <p className="text-[11px] leading-snug text-charcoal/70">
+              {availabilityLabel(product, lang)}
+            </p>
+          ) : null}
+        </div>
 
         <div className="flex flex-wrap gap-2 pt-1">
           <Link
@@ -169,9 +190,7 @@ export default function ProductCard({ product }: { product: Product }) {
                   {product.purity && product.weightGrams ? " · " : ""}
                   {product.weightGrams ? `${product.weightGrams} g` : ""}
                 </p>
-                {soldOut ? (
-                  <p className="text-sm text-charcoal/70">{pick(SOLD_OUT, lang)}</p>
-                ) : null}
+                <p className="text-sm text-charcoal/70">{availabilityLabel(product, lang)}</p>
                 <p className="font-medium text-maroon">
                   {product.priceType === "fixed" && product.priceINR !== null
                     ? `₹ ${formatINR(product.priceINR)}`

@@ -13,7 +13,10 @@ import PageHero from "@/components/ui/PageHero";
 import Notice from "@/components/ui/Notice";
 import SectionHeading from "@/components/ui/SectionHeading";
 import CatalogueBrowser from "@/components/catalogue/CatalogueBrowser";
+import EmptyCatalogue from "@/components/catalogue/EmptyCatalogue";
+import CollectionDesigns from "@/components/catalogue/CollectionDesigns";
 import BangleShowcase from "@/components/content/BangleShowcase";
+import { designPhotosForCollection, type DesignPhoto } from "@/lib/designs";
 
 /** Photo used as the visual anchor for a collection tile, chosen by collection. */
 const COLLECTION_IMAGE: Record<string, string> = {
@@ -21,6 +24,7 @@ const COLLECTION_IMAGE: Record<string, string> = {
   "gold-coins": "goldCoins",
   "gold-biscuits": "goldBiscuit",
   "silver-jewellery": "silverDisplay",
+  "diamond-jewellery": "diamondRingWhite",
   "fancy-jewellery": "bangleRubyDiamond",
   gems: "rubyRing",
 };
@@ -46,6 +50,8 @@ export function CollectionsView({
         <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {COLLECTIONS.map((collection) => {
             const items = products.filter((product) => product.categorySlug === collection.slug);
+            const photos = designPhotosForCollection(collection.slug);
+            const cover = COLLECTION_IMAGE[collection.slug] ?? photos[0]?.key;
             return (
               <li key={collection.slug}>
                 <Link
@@ -53,9 +59,9 @@ export function CollectionsView({
                   className="group flex h-full flex-col overflow-hidden border border-gold/25 bg-offwhite transition-shadow hover:shadow-soft"
                 >
                   <span className="relative block aspect-[4/3] overflow-hidden bg-gradient-to-br from-champagne/60 via-offwhite to-gold/25">
-                    {COLLECTION_IMAGE[collection.slug] ? (
+                    {cover ? (
                       <Photo
-                        image={imageFor(COLLECTION_IMAGE[collection.slug])}
+                        image={imageFor(cover)}
                         alt=""
                         sizes="(min-width: 1024px) 32vw, (min-width: 640px) 48vw, 92vw"
                         className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
@@ -87,6 +93,10 @@ export function CollectionsView({
                       {items.length > 0 ? (
                         <span className="text-[11px] text-charcoal/70">
                           {t("collections.count", { count: items.length })}
+                        </span>
+                      ) : photos.length > 0 ? (
+                        <span className="text-[11px] text-charcoal/70">
+                          {t("designStyles.count", { count: photos.length })}
                         </span>
                       ) : null}
                     </span>
@@ -124,9 +134,11 @@ export function CollectionsView({
 export function CollectionDetailView({
   collection,
   products,
+  designPhotos,
 }: {
   collection: CollectionSeed;
   products: Product[];
+  designPhotos: DesignPhoto[];
 }) {
   const { lang, t } = useLanguage();
   const items = products.filter((product) => product.categorySlug === collection.slug);
@@ -144,16 +156,24 @@ export function CollectionDetailView({
         ]}
       />
 
-      <section className="container-page space-y-6 py-12 sm:py-16">
-        <CatalogueBrowser products={items} showTypeChips />
+      <section className="container-page space-y-10 py-12 sm:py-16">
+        {/* The design wall comes first: it is the part of this page that has
+            something to look at even before the first product row is published. */}
+        <CollectionDesigns photos={designPhotos} />
+
+        {items.length > 0 ? <CatalogueBrowser products={items} showTypeChips /> : null}
+
         {items.length === 0 ? (
-          <div className="text-center">
-            <Link
-              href={ROUTES.collections}
-              className="text-sm font-medium text-maroon underline underline-offset-4"
-            >
-              {t("catalogue.backToCollections")}
-            </Link>
+          <div className="space-y-4">
+            {designPhotos.length === 0 ? <EmptyCatalogue /> : null}
+            <div className="text-center">
+              <Link
+                href={ROUTES.collections}
+                className="text-sm font-medium text-maroon underline underline-offset-4"
+              >
+                {t("catalogue.backToCollections")}
+              </Link>
+            </div>
           </div>
         ) : null}
       </section>
@@ -165,9 +185,11 @@ export function CollectionDetailView({
 export function JewelleryTypeView({
   page,
   products,
+  designPhotos,
 }: {
   page: JewelTypePage;
   products: Product[];
+  designPhotos: DesignPhoto[];
 }) {
   const { lang, t } = useLanguage();
   const featured = getFeatured(products, 4);
@@ -189,7 +211,9 @@ export function JewelleryTypeView({
           only place a visitor sees the four styles together. */}
       {page.slug === "bangles" ? <BangleShowcase /> : null}
 
-      <section className="container-page space-y-6 py-12 sm:py-16">
+      <section className="container-page space-y-10 py-12 sm:py-16">
+        <CollectionDesigns photos={designPhotos} />
+
         {featured.length > 0 ? (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {featured.map((product) => (
@@ -214,7 +238,11 @@ export function JewelleryTypeView({
           </div>
         ) : null}
 
-        <CatalogueBrowser products={products} showTypeChips={false} />
+        {products.length > 0 ? (
+          <CatalogueBrowser products={products} showTypeChips={false} />
+        ) : designPhotos.length === 0 ? (
+          <EmptyCatalogue />
+        ) : null}
       </section>
     </>
   );
@@ -223,8 +251,10 @@ export function JewelleryTypeView({
 /** /gems — the ratna collection with its own stone filter and honesty notice. */
 export function GemsView({
   products,
+  designPhotos,
 }: {
   products: Product[];
+  designPhotos: DesignPhoto[];
 }) {
   const { lang, t } = useLanguage();
   const gems = products.filter((product) => product.metal === "gemstone" || product.gemstone !== null);
@@ -262,7 +292,11 @@ export function GemsView({
           </ul>
         </div>
 
-        <CatalogueBrowser products={gems} showTypeChips={false} />
+        {gems.length > 0 ? (
+          <CatalogueBrowser products={gems} showTypeChips={false} />
+        ) : null}
+
+        <CollectionDesigns photos={designPhotos} />
       </section>
     </>
   );

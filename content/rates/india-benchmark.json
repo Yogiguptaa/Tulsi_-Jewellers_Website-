@@ -1,0 +1,7 @@
+{
+  "gold24kPer10g": 142024,
+  "silverPerKg": 195719,
+  "observedAt": "2026-10-26T18:00:00+05:30",
+  "source": "MCX",
+  "note": "Indian market figures read on 26 Oct 2026. Replace the two numbers and observedAt with the showroom's current Indian rate; every other purity is derived. Until then the site shows these as the last verified Indian rate and asks customers to confirm."
+}

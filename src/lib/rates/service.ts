@@ -177,7 +177,13 @@ async function liveFeedSnapshot(): Promise<RatesSnapshot | null> {
   if (resolution.active.kind === "external" && resolution.active.isConfigured()) {
     candidates.push(resolution.active);
   }
-  if (resolution.requested !== "manual") candidates.push(marketFallbackProvider);
+  const internationalFeed =
+    resolution.requested === "spot" ||
+    resolution.requested === "metalcharts" ||
+    resolution.requested === "metalsdev";
+  // Only an explicitly international feed may use the international fallback.
+  // The Indian benchmark never silently turns into a converted spot number.
+  if (internationalFeed) candidates.push(marketFallbackProvider);
 
   let snapshot: RatesSnapshot | null = null;
   let usedFallback = false;
@@ -382,7 +388,7 @@ function assembleSnapshot(rows: MetalRateRow[]): RatesSnapshot {
       sources,
       intraday,
       spotConverted,
-      customerNote: spotConverted ? (provider.customerNote ?? SPOT_CONVERTED_NOTE) : null,
+      customerNote: provider.customerNote ?? (spotConverted ? SPOT_CONVERTED_NOTE : null),
       isConfigured: true,
       asOf: newest,
       generatedAt: new Date().toISOString(),

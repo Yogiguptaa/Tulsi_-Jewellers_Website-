@@ -59,7 +59,12 @@ export default function HomeView({
   initialRates = null,
 }: {
   products: Product[];
-  source: "database" | "empty";
+  /**
+   * Where the visible products came from. `static` is the checked-in JSON
+   * catalogue, `mixed` means database rows overrode some of those, and `empty`
+   * means nothing is published yet — the page says so instead of inventing stock.
+   */
+  source: "static" | "database" | "mixed" | "empty";
   /** Owner-approved reviews from the database, or null when there are none. */
   reviews?: Review[] | null;
   /** Today's rate, rendered with the page instead of fetched after it. */

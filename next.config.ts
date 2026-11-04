@@ -33,9 +33,25 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
+  /**
+   * Build stamp for /api/version. Next evaluates this config once per build, so
+   * the value is the time the bundle was produced — not the time it was served.
+   */
+  env: { NEXT_PUBLIC_BUILD_TIME: new Date().toISOString() },
   partialPrefetching: true,
   // Do not advertise the framework version to the network.
   poweredByHeader: false,
+  /**
+   * Remote product photography.
+   *
+   * The catalogue stores image paths, never uploads, so an owner who already has
+   * photographs in Cloudinary can paste the delivery URL into the CSV. Only the
+   * delivery host is allowed — the same allow-list the importer enforces — and no
+   * Cloudinary credential is involved, because signed uploads are not used.
+   */
+  images: {
+    remotePatterns: [{ protocol: "https", hostname: "res.cloudinary.com" }],
+  },
   async headers() {
     return [
       {

@@ -150,3 +150,38 @@ not reach a running deployment.
 | Admin login does not work | Supabase Auth: the account must exist there **and** have a row in `admin_users` |
 | A page is blank after a deploy | Vercel → Deployments → the build log; `npm run build` locally reproduces it |
 | Festival strip is missing | Expected when no window is open. On a festival day it should show; if not, check `data.ts` `verified` |
+| A collection page shows fewer photographs than expected | The design wall lists every photograph of every style mapped to that collection in `COLLECTION_DESIGN_SLUGS` (`src/lib/designs.ts`), eight at a time. Add a style there, or add photographs to the style's `images` array |
+
+---
+
+## 10. The showroom pin, the map and media
+
+### The owner's own Google Maps link
+
+The Visit page works without any Google account (it searches the published street
+address). To point it at the showroom's own listing, paste two links in
+**Vercel → Settings → Environment Variables**, for Production *and* Preview:
+
+| Variable | Where to get it |
+| --- | --- |
+| `NEXT_PUBLIC_GOOGLE_MAPS_URL` | Google Maps → find Tulsi Jewellers → **Share → Copy link** |
+| `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_URL` | Google Maps → same place → **Share → Embed a map** → copy the `src` address inside the iframe code |
+
+Then **redeploy** (environment changes only reach a new deployment). Only `https`
+links are accepted; a mistyped value is ignored and the address search is used, so
+the page can never break because of a pasted link. No API key, no billing account.
+
+If the pin should also make the distance estimate exact, set `CONTACT.latitude`
+and `CONTACT.longitude` in `src/lib/config.ts` to the shopfront coordinates.
+
+### Photographs and video
+
+* Owner photographs: upload them to Supabase Storage and add them to a product;
+they appear in the catalogue automatically.
+* Stock photographs and video: the collection design walls read
+`public/media/manifest.json`. To grow them, put `PEXELS_API_KEY` (and/or
+`PIXABAY_API_KEY`) in `.env.local`, run `npm run sync:media`, then review each
+picture before keeping it. Video tiles render automatically once a manifest
+entry has `kind: "video"` and a `poster`; nothing else has to change.
+* Every file keeps its licence and credit; `/image-credits` prints them. Never
+copy a photograph from another jeweller's site or a marketplace.

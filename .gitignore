@@ -77,3 +77,7 @@ next-env.d.ts
 
 # Local-only: the generated CRON_SECRET for Vercel + GitHub.
 .cron-secret.txt
+
+# Local agent artefacts (never deployed, never committed)
+.cloud-attachments/
+.next-start.pid

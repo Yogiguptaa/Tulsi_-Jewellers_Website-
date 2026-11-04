@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { GEMSTONES } from "@/lib/config";
 import { getCatalogue } from "@/lib/catalogue/source";
 import { breadcrumbJsonLd, buildMetadata, jsonLdGraph } from "@/lib/seo";
+import { designPhotosForType } from "@/lib/designs";
 import { GemsView } from "@/components/views/catalogue-views";
 import JsonLd from "@/components/seo/JsonLd";
 import { imageSrc } from "@/lib/catalogue/images";
@@ -43,7 +44,7 @@ export default async function GemsPage() {
           },
         ])}
       />
-      <GemsView products={products} />
+      <GemsView products={products} designPhotos={designPhotosForType("gemstones")} />
     </>
   );
 }

@@ -10,6 +10,7 @@ import {
   sortProducts,
 } from "@/lib/catalogue/select";
 import { JEWEL_TYPES } from "@/lib/catalogue/jewel-types";
+import { CATALOGUE_TYPE_LABELS, styleLabel } from "@/lib/catalogue/catalogue-kind";
 import type { CatalogueFilters, JewelTypeSlug, Product, SortKey } from "@/lib/catalogue/types";
 import { SORT_OPTIONS } from "@/lib/catalogue/types";
 import { useLanguage } from "@/components/providers/LanguageProvider";
@@ -235,6 +236,43 @@ export default function CatalogueBrowser({
               </Chip>
             ))}
           </FilterGroup>
+
+          {/* Provenance filter. It is always offered when there is more than one
+              kind of entry, because "showroom only" is the question a visitor
+              actually asks before travelling to Hansapuri. */}
+          {facets.catalogueTypes.length > 1 ? (
+            <FilterGroup label={pick({ en: "Catalogue", hi: "कैटलॉग" }, lang)}>
+              <Chip active={!filters.catalogueType} onClick={() => set("catalogueType", undefined)}>
+                {t("catalogue.any")}
+              </Chip>
+              {facets.catalogueTypes.map((entry) => (
+                <Chip
+                  key={entry}
+                  active={filters.catalogueType === entry}
+                  onClick={() => set("catalogueType", entry)}
+                >
+                  {pick(CATALOGUE_TYPE_LABELS[entry], lang)}
+                </Chip>
+              ))}
+            </FilterGroup>
+          ) : null}
+
+          {facets.styles.length > 0 ? (
+            <FilterGroup label={pick({ en: "Style", hi: "शैली" }, lang)}>
+              <Chip active={!filters.style} onClick={() => set("style", undefined)}>
+                {t("catalogue.any")}
+              </Chip>
+              {facets.styles.map((style) => (
+                <Chip
+                  key={style}
+                  active={filters.style === style}
+                  onClick={() => set("style", style)}
+                >
+                  {styleLabel(style, lang)}
+                </Chip>
+              ))}
+            </FilterGroup>
+          ) : null}
 
           {facets.gemstones.length > 0 ? (
             <FilterGroup label={t("catalogue.filterStone")}>

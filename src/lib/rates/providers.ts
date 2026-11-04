@@ -38,6 +38,7 @@ import type { ProviderStatus, RateObservation } from "./types";
 import { METALS_DEV_HOST, metalsDevProvider } from "./providers/metalsDev";
 import { METALCHARTS_HOST, metalChartsProvider } from "./providers/metalCharts";
 import { SPOT_GOLD_ENDPOINT, spotProvider } from "./providers/spot";
+import { indiaProvider } from "./providers/india";
 
 export const SPOT_HOST = new URL(SPOT_GOLD_ENDPOINT).host;
 
@@ -99,18 +100,22 @@ function readConfig(): ProviderConfig {
  * back to manual entry with a warning in the admin panel.
  */
 function requestedProvider(): {
-  requested: "manual" | "external" | "metalsdev" | "metalcharts" | "spot";
+  requested: "manual" | "external" | "metalsdev" | "metalcharts" | "spot" | "india";
   warn: string | null;
 } {
   const raw = (process.env.RATE_PROVIDER ?? "").trim().toLowerCase();
   if (raw === "") {
-    // Nothing chosen explicitly: use MetalCharts when its key is present,
-    // otherwise the key-less feed, so the shop publishes a real rate every day
-    // instead of a blank board. Both are labelled in the admin panel.
-    return { requested: metalChartsProvider.isConfigured() ? "metalcharts" : "spot", warn: null };
+    // India first, always. A converted international spot price sits 15–22%
+    // below what an Indian counter quotes, so it can never be the default: the
+    // showroom's Indian benchmark is. Spot stays available, but only as an
+    // explicit, clearly labelled opt-in.
+    return { requested: "india", warn: null };
   }
   if (raw === "spot" || raw === "gold-api" || raw === "keyless") {
     return { requested: "spot", warn: null };
+  }
+  if (raw === "india" || raw === "mcx" || raw === "ibja") {
+    return { requested: "india", warn: null };
   }
   if (raw === "metalcharts" || raw === "metalcharts.org" || raw === "metal-charts") {
     return { requested: "metalcharts", warn: null };
@@ -126,7 +131,7 @@ function requestedProvider(): {
     requested: "manual",
     warn:
       `RATE_PROVIDER="${raw}" is not a known value, so the manual provider is in use. ` +
-      'Use "metalcharts", "metalsdev", "manual" or "external".',
+      'Use "india", "metalcharts", "metalsdev", "spot", "manual" or "external".',
   };
 }
 
@@ -203,7 +208,7 @@ function externalProvider(mapper: RateMapper, config: ProviderConfig): RateProvi
 /* -------------------------------------------------------------------------- */
 
 export type ProviderResolution = {
-  requested: "manual" | "external" | "metalsdev" | "metalcharts" | "spot";
+  requested: "manual" | "external" | "metalsdev" | "metalcharts" | "spot" | "india";
   active: RateProvider;
   /** Non-null when the requested provider could not be honoured. */
   problem: string | null;
@@ -227,6 +232,25 @@ export function resolveProvider(): ProviderResolution {
   // installation still shows today's rupee rates.
   if (requested === "spot") {
     return { requested, active: spotProvider, problem: null, mapper: null, mapperId: "spot" };
+  }
+
+  // The Indian benchmark: the default, and the only basis a Nagpur showroom
+  // should publish. When its file has no verified figure the provider stays
+  // active but inactive, so the page says "being updated" instead of quietly
+  // substituting an international number.
+  if (requested === "india") {
+    if (!indiaProvider.isConfigured()) {
+      return {
+        requested,
+        active: indiaProvider,
+        problem:
+          "No verified Indian benchmark is configured, so no rate is being published. Add the " +
+          "showroom's 24K per-10-gram and silver per-kg figures to content/rates/india-benchmark.json.",
+        mapper: null,
+        mapperId: "india",
+      };
+    }
+    return { requested, active: indiaProvider, problem: null, mapper: null, mapperId: "india" };
   }
 
   // MetalCharts is the preferred automatic feed (USD/toz spot + daily FX).
@@ -313,9 +337,11 @@ export function providerStatuses(): ProviderStatus[] {
             ? METALCHARTS_HOST
             : resolution.mapperId === "spot"
               ? SPOT_HOST
-              : resolution.mapperId
-                ? endpointHost(config.apiUrl)
-                : null,
+              : resolution.mapperId === "india"
+                ? null
+                : resolution.mapperId
+                  ? endpointHost(config.apiUrl)
+                  : null,
       hasKey:
         resolution.mapperId === "metalsdev"
           ? metalsDevProvider.isConfigured()
@@ -323,7 +349,9 @@ export function providerStatuses(): ProviderStatus[] {
             ? metalChartsProvider.isConfigured()
             : resolution.mapperId === "spot"
               ? true
-              : hasApiKey(config.apiKey),
+              : resolution.mapperId === "india"
+                ? indiaProvider.isConfigured()
+                : hasApiKey(config.apiKey),
       assumptions: resolution.mapper ? [...resolution.mapper.assumptions] : [],
     },
   ];
