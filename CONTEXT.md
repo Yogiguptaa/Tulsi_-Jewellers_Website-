@@ -36,8 +36,7 @@ Read this file first, then the stage list at the bottom.
 - [x] Owner workflow + derivation table: `docs/INDIA_RATES.md`.
 - [x] Tests: `tests/india-rates.test.ts` (derivation, silver, ₹0/NaN guards,
       validation, future timestamp, age, reference rejection both sides).
-- [ ] Live check after deploy: `/api/version` commit == merged commit, and
-      `/api/rates/latest` reports the Indian source.
+- [x] Live check after deploy: /api/version matched the merged commit (production, branch main) and /api/rates/latest reported India market benchmark (MCX) with spotConverted: false. See QA_REPORT.md.
 
 ---
 

@@ -1,154 +1,124 @@
-# QA_REPORT.md — final polish round (1 Nov 2026)
+# QA report — Tulsi Jewellers
 
-What was tested, what passed, and what cannot be automated from this machine.
-Nothing below is a claim about a surface that was not actually exercised.
+Date: 4 November 2026
+Production: https://tulsijewellerswebsite.vercel.app/
+Branch shipped: `final-polish` → `main`
 
----
+## 1. Why nothing was changing
 
-## 1. The rates failure — cause and fix
+`main` and `origin/main` were both at `517e7cd`, with **51 uncommitted entries**
+(26 modified tracked files, 25 new files) on the build machine. Vercel builds
+from GitHub `main`, so it had no new commit to build and kept serving the old
+site. This was not a caching fault: there is no service worker, no `next-pwa`
+registration and no `revalidate` override in the layout, home page or
+`next.config.ts`.
 
-**Symptom on the live site:** the board said "Today's rate is being updated", and the
-GitHub Action "Fetch gold and silver rates" failed after about three seconds.
-
-**Measured cause (two independent faults, both verified by calling the deployment):**
-
-| Check | Result |
-| --- | --- |
-| `GET https://tulsijewellerswebsite.vercel.app/api/cron/fetch-rates` | **503** `{"ok":false,"skipped":true,"message":"CRON_SECRET is not configured; the job refuses to run."}` in **1.4 s** — the exact "fails after 3 seconds" |
-| `GET https://tulsijewellerswebsite.vercel.app/api/rates/latest` | **200**, `status: "unavailable"`, `isConfigured: false`, every line `rate: null` |
-| Local `.env.local` | absent; production Vercel variables could not be inspected from here |
-
-1. **No `CRON_SECRET` in the Vercel production environment.** The route refuses to run
-   without it (by design — it is never an open write path), so the workflow's `curl -f`
-   failed immediately and reported nothing useful.
-2. **No persistent store in production.** Nothing was stored, with or without the cron:
-   Supabase keys were never added to Vercel, and the file-backed local store is
-   deliberately disabled when `NODE_ENV=production` (a serverless disk cannot keep it).
-   So even a successful fetch would have had nowhere to write, and the read path had
-   nothing to read.
-
-**Fixes**
-
-- `.github/workflows/fetch-rates.yml` rewritten: `curl` without `--fail` captures the
-  HTTP status **and** the response body, then fails with a named cause per status —
-  `000` (bad `SITE_URL`), `401/403` (secret mismatch or deployment protection), `404`
-  (wrong path), `429` (quota), `503` (secret not set in Vercel), `5xx` (server error,
-  body printed). The secret is never printed. Two schedules (04:00 and 05:00 UTC) plus
-  `workflow_dispatch`; the endpoint is idempotent, so the second run costs nothing.
-- `src/lib/rates/service.ts` gains a **live-feed fallback**: when no database and no
-  local store are configured, the configured automatic feed is read at request time and
-  rendered through the same snapshot pipeline (same validation of positive numbers,
-  INR, purities, timestamps and the "converted to INR" note). It writes nothing, is
-  cached for 15 minutes per instance (60 s after a failure) and falls back to the honest
-  call/WhatsApp message when the feed itself fails. This is what makes the deployed
-  board show today's rate **without any owner action**; adding Supabase + `CRON_SECRET`
-  switches the site to the stored, scheduled path.
-- `formatDateTime` now prints the zone: `1 Nov 2026, 12:13 pm IST` (it previously dropped
-  the zone because `timeZoneName` cannot be combined with `timeStyle`).
-
-**Proof, from a production build with no store configured (`next start`, `NODE_ENV=production`):**
+All of that work is now committed on `final-polish`, merged to `main`, and
+deployed. Proof, not assertion:
 
 ```
-/api/rates/latest → status "updated", asOf 2026-11-01T06:43:32Z, isConfigured true
-gold-999 ₹1,18,335.38 / 10 g   gold-916 ₹1,08,503.71 / 10 g   gold-833 ₹98,672.04 / 10 g
-gold-750 ₹88,840.37 / 10 g     gold-585 ₹69,295.49 / 10 g     silver-999 ₹1,50,358.35 / kg
-customerNote: "International market price converted to INR. …"
+GET /api/version
+{"commit":"265a8dc1c84b9c424357dc6d0fd007dd804637a0","shortCommit":"265a8dc",
+ "builtAt":"2026-11-04T05:30:58.279Z","env":"production","branch":"main"}
 ```
 
-`/rates` rendered the same six values with "1 Nov 2026, 12:13 pm", the source line
-"International spot market (converted to INR)", the IST timestamp and
-"Making charges vary by design and quality and are finalised at the shop."
-No `GST`, no `benchmark`, no ₹0 and no environment text on the page.
+`/api/version` returns `Cache-Control: no-store` and does not exist in the old
+build (it was 404 before this deploy). The admin footer shows `v<short sha>`.
 
----
+## 2. Rates — what is served now
 
-## 2. The eight issues found on the live site
+The old board published an **international spot price converted to rupees**,
+which is 15–22% below an Indian counter quote because duty, local premium and
+taxes sit on top.
 
-| # | Issue | Status | How it was checked |
-| --- | --- | --- | --- |
-| 1 | Rates stuck on "being updated", Action failing | Fixed (see §1) | Status codes and JSON above |
-| 2 | Empty "New designs arriving" box | Fixed — the whole Featured section is omitted when there are no published products; the Popular Designs strip now takes that place | `/` HTML contains no "New designs arriving"; the strip and six `/designs/*` links render |
-| 3 | Two different addresses | Fixed — the home Visit block prints `CONTACT.address`, the single source used by header, footer, Visit, Contact, schema and metadata | `Hansapuri (Itwari)` count on `/` = 0; full address present |
-| 4 | Meta description said "today's benchmark rate" | Fixed → "today's gold and silver rate" | `src/app/(site)/page.tsx` + `/` HTML |
-| 5 | "Design inspiration, not stock" caption | Replaced with "Popular designs. What is on the counter changes often: message us to see the latest." (EN + HI) | `/` HTML |
-| 6 | "Loading…" text and a "Watch the intro" block for a film that does not exist | Fixed — the cinematic intro component, its footer replay button and its strings are removed; the route skeleton no longer prints any loading word | `Loading…` count on `/` = 0 |
-| 7 | "Ask about this style" | Renamed "Enquire on WhatsApp" (EN + HI) on every style tile | 6 occurrences on `/` |
-| 8 | Internal links must return 200 | Verified — 54 routes and every in-page link on `/` and `/designs` answer 200 | `npm run test:local` (see §3) |
+The board now reads one verified Indian figure and derives the rest:
 
----
+| Purity | Live value (per 10 g) | Derivation |
+|---|---|---|
+| 24K / 999 | **₹1,42,024.00** | Indian 24K base |
+| 22K / 916 | ₹1,30,093.98 | × 0.916 |
+| 20K / 833 | ₹1,18,305.99 | × 0.833 |
+| 18K / 750 | ₹1,06,518.00 | × 0.750 |
+| 14K / 585 | ₹83,084.04 | × 0.585 |
+| Silver 999 / kg | ₹1,95,719.00 | Indian silver base |
 
-## 3. Automated checks run in this round
+Comparison with the Indian reference points supplied for this work:
 
-| Check | Command | Result |
-| --- | --- | --- |
-| Placeholder guard | `npm run check:placeholders` | ✓ no customer-visible placeholders |
-| Copy / phone / licence guard (new) | `npm run check:copy` | ✓ 5,606 strings, 11 design styles, 22 media assets |
-| Types | `tsc --noEmit` | ✓ 0 errors |
-| Lint | `eslint src --max-warnings=0` | ✓ 0 warnings |
-| Production build | `npm run build` | ✓ exit 0, `/designs` and 11 `/designs/*` pages prerendered |
-| Live smoke test (new) | `npm run test:local` / `npm run test:live` | ✓ 54 routes 200, 0 failing links, rates API 6/6 values |
-| 404 for an unknown style | `GET /designs/not-a-style` | 404 |
+- 24K ₹1,42,024 vs MCX ₹1,42,024 — the same figure (it is the source).
+- 24K ₹1,42,024 vs Nagpur retail ₹1,45,376 (1 Nov) — **2.3% lower**, which is
+  exactly the kind of small showroom-to-benchmark difference the label covers.
+- 22K ₹1,30,093.98 vs Nagpur retail 22K ₹1,33,163 — 2.3% lower.
+- The old live 24K was ₹1,20,547.52, i.e. **17.1% below** Nagpur retail and
+  **15.1% below** MCX.
 
-New files that make this repeatable: `scripts/check-customer-copy.mjs`,
-`scripts/smoke-live.mjs`, `.github/workflows/ci.yml`.
+Live payload checks (`/api/rates/latest`):
 
----
+- `providerLabel: "India market benchmark (MCX)"`
+- `spotConverted: false` (no silent conversion)
+- `customerNote: "India market benchmark (MCX), INR. Showroom rates may differ slightly."`
+- six lines, no `₹0`, no `NaN`
+- `status: "stale"` with notice *“Showing the last verified rate from 26 Oct
+  2026, 6:00 pm IST. Please confirm today's rate at the store.”* — correct and
+  deliberate: the seeded figure is dated 26 Oct 2026.
 
-## 4. Not automated here — stated as a limitation, not a pass
+**Action for the owner:** update `content/rates/india-benchmark.json` (two
+numbers + `observedAt`) each morning; see `docs/INDIA_RATES.md`. Until then the
+site honestly shows the last verified figure and asks customers to confirm.
 
-- **Browser end-to-end tests, axe accessibility scans and Lighthouse** are not in this
-  repository (no Playwright, no `@axe-core`, no Lighthouse dependency), and none were
-  installed for this round. Those results are **not** claimed. Layout was checked by
-  rendering the pages and reading the HTML; no visual screenshot review was done.
-- **WhatsApp and phone call behaviour on a real handset** (prefilled message, dialler,
-  two numbers) needs a person with a phone.
-- **Admin flows against Supabase** — login, role gating, product create/upload, rate
-  override, enquiries list — need the Supabase project and a signed-in account. The
-  code paths were type-checked and linted, not executed end to end.
-- **RLS policies** are written in `supabase/schema.sql` + migrations but were not
-  executed against a live database.
-- **Vercel Cron / Deployment Protection** settings can only be confirmed in the Vercel
-  dashboard.
-- **Soft 404s on some dynamic routes**: `/guides/<unknown>`, `/collections/<unknown>`,
-  `/jewellery/<unknown>` and `/products/<unknown>` return HTTP 200 with a not-found
-  view (a streaming artefact of the route-group `loading.tsx`). The pages show the
-  correct "not found" content and are `noindex`; the status code is the gap. New
-  `/designs/<unknown>` routes do return 404. Fixing the rest means changing the
-  streaming boundary for the whole site, which was out of scope for this round.
+Reference check: before publishing, the 24K figure is compared with the converted
+spot value. More than 3% below or more than 30% above that reference is held for
+review. Unit-tested both ways.
 
----
-
-## 5. Owner actions still needed
-
-1. **Vercel → Settings → Environment Variables (Production and Preview):**
-   `CRON_SECRET` (any long random string), then redeploy. This alone turns the failing
-   GitHub Action green.
-2. **GitHub → Settings → Secrets → Actions:** `CRON_SECRET` with the *same* value, and
-   optionally `SITE_URL=https://tulsijewellerswebsite.vercel.app`.
-3. **Supabase** (project URL + anon key + service role key in Vercel) to switch rates
-   from the live fallback to stored, auditable rows with history, admin override and
-   the quota counter. Run the SQL in the order listed in `docs/DEPLOY.md`.
-4. Real showroom photographs and the real logo; product uploads in the admin panel.
-5. Confirm the address, hours and both phone numbers match the signboard.
-
----
-
-## 12. Festival engine and resilience layer (2 Nov 2026)
-
-Run from the repository, against a production build (`next build` + `next start`).
+## 3. Checks actually run
 
 | Check | Command | Result |
-| --- | --- | --- |
-| Unit suite (47 tests) | `npm run test:unit` | **pass** — festival data integrity, festival selection, safeFetch, calculator, formatting, env |
-| Placeholder guard | `npm run check:placeholders` | pass (4 documented placeholders, none visible) |
-| Copy / phone / licence guard | `npm run check:copy` | pass (5,677 strings, 11 styles, 22 media assets) |
-| Types | `npm run check:types` | pass |
-| ESLint | `npm run lint` | pass, zero warnings |
-| Production build | `npm run build` | pass |
-| `/api/health` | `curl localhost:3111/api/health` | `200`, `status: "ok"`, rates 6/6 filled, `nextFestivalDays: 4` |
-| Festival strip on `/` | `curl /` | renders "Dhanteras · Friday 6 November · 4 days to go" + copy + WhatsApp CTA |
-| Festival strip on `/collections` | `curl /collections` | renders the same band |
+|---|---|---|
+| Placeholder guard | `npm run verify` | passed |
+| Customer-copy / media guard | `npm run verify` | passed — 5,928 strings, 13 design styles, 36 media assets |
+| Catalogue validation | `npm run import-products --check` | passed — CSV valid, 0 products (empty state is intentional) |
+| Unit tests (Vitest) | `npm run verify` | **86 passed / 86**, 9 files |
+| TypeScript | `tsc --noEmit` | passed |
+| ESLint | `eslint src --max-warnings=0` | passed |
+| Production build | `next build` | passed — 83 routes generated |
+| Secret scan | tracked files + history | no keys; only `.env.example` is committed |
+| Live smoke | `curl` | `/`, `/rates`, `/collections`, `/designs`, `/visit-us`, `/api/health`, `/api/version`, `/sitemap.xml` all **200** |
 
-Not run here, stated rather than implied: browser e2e, axe, Lighthouse, and any
-Supabase-backed surface (no project attached). The rate board and the festival
-strip were exercised over HTTP against the built site, not in a browser.
+New tests added for this round (`tests/india-rates.test.ts`, 15 tests):
+derivation of every purity and the exact factors, per-gram figures, silver 925,
+empty/invalid base producing no rows, no zero or NaN, validation of missing
+values, a decimal-point slip, a future timestamp, age calculation, and
+reference-check rejection both below and above the band.
+
+## 4. What is still open, and why
+
+These were **not** done, and are reported as blocked rather than claimed:
+
+1. **Unique images per collection/design.** The site has 36 licensed media assets
+   and some sets reuse images (e.g. `mangalsutra` and `chains-and-pendants` have
+   one each). The required 6×8 collection sets and 14×6 design sets need
+   `PEXELS_API_KEY` / `PIXABAY_API_KEY` for `npm run sync:media`; neither exists
+   in the environment. No images were taken from other jewellers.
+2. **Catalogue products.** `content/catalogue/products.csv` is header-only, so
+   the catalogue correctly shows its empty state. The importer, validation and
+   pages are in place; real products, weights and photos must come from the
+   owner.
+3. **Browser test suites.** Playwright, axe and Lighthouse are not installed in
+   this repository (no browser runner), so the e2e/accessibility/Lighthouse
+   checklist was not executed. It is not reported as passing.
+4. **Database-backed admin.** Supabase is not configured, so manual entry is the
+   file-based path in `docs/INDIA_RATES.md`; `/api/health` shows
+   `database: not_configured`, `scheduledJob: not_configured`.
+5. **India/MCX live feed.** No verified India endpoint key is available. The
+   MetalCharts India pages could not be confirmed without an account, and the
+   “Mellora API” key/terms were not available, so neither is used.
+
+## 5. Limitations and owner inputs
+
+Still needed from the owner: real showroom photographs (Cloudinary or
+`catalogue/images/<id>/`), the product CSV, the Google Maps embed link, a Google
+Business Profile link, and any paid Indian rate-feed key. The site functions
+without all of them.
+
+No secrets were committed. `.env.local` is absent locally; `.env.production`
+contains only `NEXT_PUBLIC_SITE_URL`. If a key was ever pasted into a chat or
+document, revoke it in the provider dashboard and issue a new one.
