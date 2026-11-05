@@ -31,6 +31,10 @@ describe("realistic media gate", () => {
       "rhinestone earrings",
       "brass necklace",
       "gold plated fashion jewellery",
+      "gold christmas baubles",
+      "gold lipstick on a table",
+      "pocket watch with a gold chain",
+      "gold bracelet on jeans",
     ]) {
       const result = isSuitable({ ...good, alt });
       expect(result.ok, alt).toBe(false);
@@ -63,6 +67,12 @@ describe("realistic media gate", () => {
   it("rejects a small image even when the wording is right", () => {
     expect(isSuitable({ ...good, width: MIN_LONG_EDGE - 1, height: 900 }).ok).toBe(false);
     expect(isSuitable({ ...good, width: 2400, height: 1200 }).ok).toBe(true);
+  });
+
+  it("rejects bullion in a jewellery set and jewellery in a bullion set", () => {
+    expect(isSuitable({ ...good, alt: "gold bars stacked in a vault" }).ok).toBe(false);
+    expect(isSuitable({ ...good, alt: "24k gold coin close up" }).ok).toBe(false);
+    expect(isSuitable({ ...good, set: "gold-coins", alt: "24k gold coin close up" }).ok).toBe(true);
   });
 
   it("rejects a photograph whose description does not name the metal", () => {

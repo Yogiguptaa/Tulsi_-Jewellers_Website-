@@ -79,3 +79,24 @@ Setting `RATE_PROVIDER=spot` (or `metalcharts` / `metalsdev` with their keys)
 switches to the international basis. It is labelled as converted spot, carries
 the “Indian market rates can differ” note, and is **never** selected by default
 or as a fallback.
+
+
+## Four readings a day
+
+The showroom checks the Indian benchmark four times a day: about 09:30, 13:30,
+19:30 and 01:30 IST. `.github/workflows/fetch-rates.yml` calls
+`/api/cron/fetch-rates` at 01:30, 07:30, 13:30 and 19:30 UTC (07:00, 13:00,
+19:00 and 01:00 IST), and Vercel Cron keeps its one guaranteed daily run.
+
+What a scheduled run can and cannot do:
+
+| Configuration | What happens |
+|---|---|
+| `RATE_API_KEY` (MetalCharts) + `CRON_SECRET` | The job fetches a real intraday feed, validates each value and stores it. This is the only way the number changes without a deploy. |
+| `CRON_SECRET` + Supabase keys, no feed key | The job runs, logs that no feed is configured, and keeps the last verified value. |
+| Neither | The endpoint answers 503 and the site keeps showing the benchmark file with its own date. |
+
+Until a feed key exists, `content/rates/india-benchmark.json` is still a
+build-time file: changing it needs a commit and a deploy. The home rate strip
+now prints an explicit warning with the last verified date whenever the value is
+older than the freshness window, in both day and night themes.

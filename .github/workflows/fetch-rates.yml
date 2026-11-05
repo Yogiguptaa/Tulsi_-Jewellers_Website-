@@ -1,10 +1,13 @@
 # Automatic daily rates — the safety net alongside Vercel Cron.
 #
-# Two triggers, one job:
-#   04:00 UTC = 09:30 IST   the normal daily run
-#   05:00 UTC = 10:30 IST   a retry in case the first run failed. The endpoint is
-#                           idempotent, so when today's rates are already stored
-#                           it returns 200 with skipped=true and spends no call.
+# Four triggers, one job. IST = UTC + 5:30.
+#   01:30, 07:30, 13:30, 19:30 IST — one reading every six hours, matching the
+#   showroom's four daily rate checks. The endpoint is idempotent, so a run with
+#   nothing new to store returns 200 with skipped=true and spends no API call.
+#
+# A scheduled run can only refresh a number that a real India feed supplies.
+# With only the build-time benchmark file, it logs a check and the site keeps
+# showing the last verified figure with its date.
 #
 # Required secret (Settings → Secrets and variables → Actions):
 #   CRON_SECRET   exactly the same value as CRON_SECRET in Vercel (Production and
@@ -27,8 +30,10 @@ name: Fetch gold and silver rates
 
 on:
   schedule:
-    - cron: "0 4 * * *"
-    - cron: "0 5 * * *"
+    - cron: "30 1 * * *"
+    - cron: "30 7 * * *"
+    - cron: "30 13 * * *"
+    - cron: "30 19 * * *"
   workflow_dispatch: {}
 
 concurrency:

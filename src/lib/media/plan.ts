@@ -62,6 +62,41 @@ export const REJECT_PATTERNS: readonly RegExp[] = [
   /\bpeople\b/i,
   /\bwearing\b/i,
   /\bhand\b/i,
+  // Things that merely contain the word "gold": a lipstick, a Christmas
+  // bauble and a pocket watch all passed a metal-only check during the first run.
+  /christmas/i,
+  /easter/i,
+  /halloween/i,
+  /wallpaper/i,
+  /decoration/i,
+  /ornament/i,
+  /bauble/i,
+  /watch/i,
+  /clock/i,
+  /lipstick/i,
+  /makeup/i,
+  /make-up/i,
+  /wine/i,
+  /candle/i,
+  /coffee/i,
+  /notebook/i,
+  /scarf/i,
+  /boots/i,
+  /shoes/i,
+  /building/i,
+  /church/i,
+  /flower/i,
+  /pyrite/i,
+  /fools gold/i,
+  /dollar/i,
+  /money/i,
+  /nugget/i,
+  /jeans/i,
+  /denim/i,
+  /jacket/i,
+  /shirt/i,
+  /dress/i,
+  /outfit/i,
 ];
 
 const FAMILY_PATTERNS: Record<MediaFamily, RegExp> = {
@@ -71,8 +106,35 @@ const FAMILY_PATTERNS: Record<MediaFamily, RegExp> = {
   gemstone: /\bruby\b|\bemerald\b|\bsapphire\b|\bpearl\b|\btopaz\b|\bamethyst\b|\bgemstone\b|\bratna\b/i,
 };
 
-/** Retrieval size floor. A 900 px crop looks soft on a retina card. */
-export const MIN_LONG_EDGE = 1600;
+/**
+ * Retrieval size floor. Pixabay's public feed tops out at 1280 px for most
+ * photographs, so 1200 is the smallest width that still looks sharp in a card
+ * without demanding a file the source does not serve.
+ */
+export const MIN_LONG_EDGE = 1200;
+
+/**
+ * A photograph must show a piece of jewellery, not something that happens to be
+ * tagged "gold". This is the check that keeps a Christmas bauble out of the
+ * necklace set.
+ */
+const JEWELLERY_OBJECTS =
+  /\b(necklaces?|jewellery|jewelry|earrings?|jhumkas?|bangles?|bracelets?|kadas?|rings?|pendants?|chains?|anklets?|mangalsutra|brooch(?:es)?|choker|jewels|gemstones?)\b/i;
+
+/** Coins and biscuits are bought as bullion, so their sets use bullion nouns. */
+const BULLION_OBJECTS = /\b(coins?|bullion|ingots?|bars?|biscuits?)\b/i;
+
+const GEM_OBJECTS =
+  /\b(ruby|rubies|emerald|emeralds|sapphire|sapphires|pearls?|topaz|amethyst|gemstones?|gems?)\b/i;
+
+const OBJECT_PATTERNS: Record<string, RegExp> = {
+  "gold-coins": BULLION_OBJECTS,
+  "gold-biscuits": BULLION_OBJECTS,
+  "gold-coins-and-biscuits": BULLION_OBJECTS,
+  gems: GEM_OBJECTS,
+  "silver-and-pearls":
+    /\b(pearls?|necklaces?|jewellery|jewelry|pendants?|bracelets?|earrings?)\b/i,
+};
 
 export const COLLECTION_PLANS: readonly MediaPlan[] = [
   {
@@ -332,6 +394,10 @@ export function isSuitable(input: SuitabilityInput): Suitability {
   if (!plan) return { ok: false, reason: `unknown set ${input.set}` };
   if (!FAMILY_PATTERNS[plan.family].test(text)) {
     return { ok: false, reason: `not described as ${plan.family}` };
+  }
+  const objects = OBJECT_PATTERNS[plan.slug] ?? JEWELLERY_OBJECTS;
+  if (!objects.test(text)) {
+    return { ok: false, reason: "not a photograph of jewellery" };
   }
   return { ok: true };
 }

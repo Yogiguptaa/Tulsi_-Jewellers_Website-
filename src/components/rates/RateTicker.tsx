@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowDownRight, ArrowUpRight, Minus, RefreshCw, TrendingUp } from "lucide-react";
+import { AlertTriangle, ArrowDownRight, ArrowUpRight, Minus, RefreshCw, TrendingUp } from "lucide-react";
 import { CONTACT, ROUTES, telDisplay, telHref, whatsappHref } from "@/lib/config";
 import { ageLabel, formatINR, formatDateTime } from "@/lib/rates/format";
 import type { ApiRateLine, ApiRatesPayload } from "@/lib/rates/api-payload";
@@ -179,6 +179,15 @@ export default function RateTicker({ initial = null }: { initial?: ApiRatesPaylo
           </Link>
         </div>
       </div>
+
+      {/* A rate older than the freshness window says so on the home strip too,
+          in day and night themes alike — not only on the rates page. */}
+      {hasAnyValue && data.status === "stale" && data.notice ? (
+        <p className="container-page flex items-start gap-2 border-t border-maroon/25 bg-maroon/5 py-2 text-[11px] font-medium text-maroon">
+          <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+          <span>{data.notice}</span>
+        </p>
+      ) : null}
 
       {/* Converted spot prices carry their own mandatory note, printed verbatim. */}
       {hasAnyValue && data.customerNote ? (

@@ -19,7 +19,7 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 
-import { PLANS, coverage, isSuitable, planTotals } from "../src/lib/media/plan.ts";
+import { MIN_LONG_EDGE, PLANS, coverage, isSuitable, planTotals } from "../src/lib/media/plan.ts";
 
 type Asset = {
   key: string;
@@ -62,6 +62,8 @@ const manifestFile = path.join(mediaRoot, "manifest.json");
 const USER_AGENT = "TulsiJewellersMediaSync/1.0";
 
 const dryRun = process.argv.includes("--dry");
+/** Prints why candidates were dropped instead of failing silently. */
+const debug = process.argv.includes("--debug");
 const only = process.argv.find((arg) => arg.startsWith("--only="))?.slice("--only=".length);
 const plans = only ? PLANS.filter((plan) => plan.slug === only) : PLANS;
 
@@ -139,6 +141,8 @@ type PixabayHit = {
   pageURL: string;
   tags?: string;
   user?: string;
+  /** 1920 px long edge; `largeImageURL` is only 1280 px. */
+  fullHDURL?: string;
   largeImageURL: string;
   imageWidth: number;
   imageHeight: number;
@@ -157,7 +161,7 @@ async function searchPixabay(query: string, key: string, page: number): Promise<
     creator: hit.user ?? "Pixabay contributor",
     license: "Pixabay licence",
     licenseUrl: "https://pixabay.com/service/license-summary/",
-    src: hit.largeImageURL,
+    src: hit.fullHDURL ?? hit.largeImageURL,
     alt: hit.tags ?? "",
     width: hit.imageWidth,
     height: hit.imageHeight,
@@ -264,9 +268,11 @@ async function main(): Promise<void> {
         try {
           if (pexels) candidates = candidates.concat(await searchPexels(query, pexels, page));
           if (pixabay) candidates = candidates.concat(await searchPixabay(query, pixabay, page));
-        } catch {
+        } catch (error) {
+          if (debug) console.log(`  search failed [${query} p${page}]:`, (error as Error).message);
           continue;
         }
+        if (debug) console.log(`  [${query} p${page}] ${candidates.length} candidates`);
 
         for (const candidate of candidates) {
           if (needed <= 0) break;
@@ -277,7 +283,10 @@ async function main(): Promise<void> {
             width: candidate.width,
             height: candidate.height,
           });
-          if (!gate.ok) continue;
+          if (!gate.ok) {
+            if (debug) console.log(`    reject: ${gate.reason} — ${candidate.alt.slice(0, 70)}`);
+            continue;
+          }
 
           let buffer: Buffer;
           try {
@@ -293,7 +302,10 @@ async function main(): Promise<void> {
             const meta = await sharp(buffer).metadata();
             width = meta.width ?? 0;
             height = meta.height ?? 0;
-            if (Math.max(width, height) < 1600) continue;
+            if (Math.max(width, height) < MIN_LONG_EDGE) {
+              if (debug) console.log(`    reject: downloaded ${width}x${height} — ${candidate.alt.slice(0, 50)}`);
+              continue;
+            }
             hash = await dhash(buffer);
           } catch {
             continue;

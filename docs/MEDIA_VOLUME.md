@@ -22,7 +22,7 @@ diamond jewellery, fancy gold, gems/ratna.
 
 A candidate is rejected when:
 
-- its long edge is under **1600 px**;
+- its long edge is under **1200 px** (the largest Pixabay serves for most photos);
 - the description mentions **costume, imitation, artificial, plastic, acrylic,
   toy, fake, rhinestone, brass, copper, museum, antique, vintage, painting,
   drawing, illustration, sketch, cartoon, clipart, render, 3D, mannequin**;
@@ -61,3 +61,22 @@ stops at whatever passes the gate; the coverage table reports the real number pe
 set rather than padding it. The reliable route to a full catalogue is the
 showroom's own photography: `catalogue/images/<product-id>/1.jpg`, which the
 catalogue importer picks up and labels **In showroom**.
+
+
+## What happened with a real stock key
+
+A Pixabay key was supplied and the pipeline was run against it. The API answered
+(200, ~200 candidates per query), but after the realism gate the survivors were
+still wrong for this shop: a gold-tone crescent pendant with blue stones, a
+fashion bangle on a wooden bowl, and bracelets photographed on jeans and a
+camouflage jacket. The 63 survivors were reviewed and all were discarded rather
+than published. Two lessons are now enforced in code:
+
+- the description must contain a jewellery object (necklace, ring, bangle,
+  chain, pendant, earring, anklet, mangalsutra, brooch);
+- clothing and fashion contexts (jeans, denim, jacket, shirt, dress, outfit)
+  are rejected, alongside seasonal decorations, watches, clocks and cosmetics.
+
+The site therefore keeps its 33 curated photographs. Reaching 100 per section
+still needs the showroom's own photography or a licensed Indian-jewellery
+library; a general stock site does not contain it.

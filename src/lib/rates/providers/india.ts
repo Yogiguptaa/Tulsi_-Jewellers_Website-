@@ -84,10 +84,12 @@ export const indiaProvider: RateProvider = {
   note:
     "Uses the showroom's verified Indian 24K per-10-gram figure and derives 22K, 20K, 18K and 14K " +
     "(×0.916, ×0.833, ×0.750, ×0.585) plus silver 999 per kg. Each value is checked against the " +
-    "converted spot price before publication. Update content/rates/india-benchmark.json daily.",
+    "converted spot price before publication. Update content/rates/india-benchmark.json four times a day.",
   publication: "published",
   customerNote: INDIA_MARKET_NOTE,
-  refreshMinutes: 1440,
+  // Four readings a day is the freshness the showroom aims for; the UI uses
+  // this to decide when to offer a refresh, never to claim a number is live.
+  refreshMinutes: 360,
   /**
    * Deliberately free of `Date.now()`: this is read while a page is being
    * prerendered, and Next refuses an unstable value there. The future-date and
