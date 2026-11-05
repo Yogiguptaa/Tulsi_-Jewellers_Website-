@@ -10,7 +10,7 @@ export const metadata: Metadata = buildMetadata({
   description:
     "Popular Indian jewellery styles explained: bridal sets, temple jewellery, kundan and polki, jhumkas, kadas, mangalsutra, chains, diamond rings, silver and coins. Style information, not stock.",
   path: "/designs",
-  image: imageSrc("bridePortrait"),
+  image: imageSrc("jhumkaGold"),
   keywords: [
     "bridal necklace set Nagpur",
     "temple jewellery Nagpur",

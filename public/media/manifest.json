@@ -213,48 +213,6 @@
       }
     },
     {
-      "key": "bridePortrait",
-      "src": "/media/stock/bridePortrait.jpg",
-      "width": 1280,
-      "height": 1920,
-      "blurDataURL": "data:image/webp;base64,UklGRloAAABXRUJQVlA4IE4AAADwAwCdASoNABQAPwFurk+rJqQiMAgBYCAJYgCw7CFsesfVNaPiZiIAAP7HIUZ+Xav0jH8LBuwHko801Jf4g02TSHpOUAwxszZ2TsfIaAA=",
-      "category": "bridal",
-      "alt": {
-        "en": "Bride wearing traditional Indian bridal jewellery",
-        "hi": "पारंपरिक भारतीय दुल्हन के आभूषण पहने दुल्हन"
-      },
-      "credit": {
-        "provider": "Wikimedia Commons",
-        "title": "File:Happy bride with Indian bridal jewellery IMG 3589.jpg",
-        "creator": "Sumita Roy Dutta",
-        "license": "CC BY-SA 4.0",
-        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-        "page": "https://commons.wikimedia.org/wiki/File:Happy_bride_with_Indian_bridal_jewellery_IMG_3589.jpg",
-        "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Happy_bride_with_Indian_bridal_jewellery_IMG_3589.jpg/1280px-Happy_bride_with_Indian_bridal_jewellery_IMG_3589.jpg"
-      }
-    },
-    {
-      "key": "brideDetail",
-      "src": "/media/stock/brideDetail.jpg",
-      "width": 1280,
-      "height": 1577,
-      "blurDataURL": "data:image/webp;base64,UklGRlYAAABXRUJQVlA4IEoAAABwAwCdASoQABQAPwFqrU8rJaQiMAgBYCAJZACdABYCshd7wTwA/tsjgi8bx/JiGMNJC3fWR6IK2HNz7KNzgIPnohlBF3UD8eGAAA==",
-      "category": "bridal",
-      "alt": {
-        "en": "Close view of North Indian bridal jewellery and styling",
-        "hi": "उत्तर भारतीय दुल्हन के आभूषणों का नज़दीकी दृश्य"
-      },
-      "credit": {
-        "provider": "Wikimedia Commons",
-        "title": "File:Bridal makeover and wedding jewellery of North India IMG 4585.jpg",
-        "creator": "Sumita Roy Dutta",
-        "license": "CC BY-SA 4.0",
-        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-        "page": "https://commons.wikimedia.org/wiki/File:Bridal_makeover_and_wedding_jewellery_of_North_India_IMG_4585.jpg",
-        "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Bridal_makeover_and_wedding_jewellery_of_North_India_IMG_4585.jpg/1280px-Bridal_makeover_and_wedding_jewellery_of_North_India_IMG_4585.jpg"
-      }
-    },
-    {
       "key": "rubyRing",
       "src": "/media/stock/rubyRing.jpg",
       "width": 1280,
@@ -589,27 +547,6 @@
         "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/5/52/Gold_bullion_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
       },
       "blurDataURL": "data:image/webp;base64,UklGRj4AAABXRUJQVlA4IDIAAACwAQCdASoQAAsAA8BgJbACdAENGtwAAPX8bchbjivc+T5zqLpNEHbYWoYjtCav0C+YAA=="
-    },
-    {
-      "key": "bridalJewelleryIndia",
-      "src": "/media/stock/bridalJewelleryIndia.jpg",
-      "width": 1920,
-      "height": 1440,
-      "category": "bridal",
-      "alt": {
-        "en": "Bride wearing traditional Indian gold jewellery",
-        "hi": "पारंपरिक भारतीय सोने के गहनों में दुल्हन"
-      },
-      "credit": {
-        "provider": "Wikimedia Commons",
-        "title": "File:Bride by prakhar.jpg",
-        "creator": "Prakhar Amba from Grenoble, France",
-        "license": "CC BY 2.0",
-        "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
-        "page": "https://commons.wikimedia.org/wiki/File:Bride_by_prakhar.jpg",
-        "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f0/Bride_by_prakhar.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
-      },
-      "blurDataURL": "data:image/webp;base64,UklGRkgAAABXRUJQVlA4IDwAAADwAQCdASoQAAwAA8BgJbACdAChNZJUpIAA+gGx8UFNeYpEmHOt60vPyUQYp8kHDty8LCW0R4z7D2YjQAA="
     },
     {
       "key": "goldNecklaceIndia",
