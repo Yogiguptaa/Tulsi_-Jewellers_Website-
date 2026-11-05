@@ -232,7 +232,7 @@ async function Editor({ params }: { params: Promise<{ ref: string }> }) {
                   options={[
                     { value: "gold", label: "Gold" },
                     { value: "silver", label: "Silver" },
-                    { value: "fashion", label: "Fancy / artificial" },
+                    { value: "fashion", label: "Fancy gold" },
                     { value: "gemstone", label: "Gemstone" },
                   ]}
                 />
